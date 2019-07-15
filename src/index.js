@@ -1,12 +1,32 @@
+import './main.css'
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import store from './store/configureStore';
+import {Provider} from 'react-redux';
+import {browserHistory,Router,Route} from 'react-router';
+import {syncHistoryWithStore} from 'react-router-redux';
+import Layout from './Containers/Layout';
+import Phones from './Containers/Phones';
+import Phone from './Containers/Phone';
+import Basket from './Containers/Basket';
+import Products from './Containers/Products';
+import ProductDetails from './Containers/ProductDetails';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const history = syncHistoryWithStore(browserHistory,store);
+const jsx = (
+    <Provider store={store}>
+       <Router history={history}>
+            <Route component={Layout}>
+                <Route exact path="/" component={Products}/>
+                <Route path='/products' component={Products}></Route>
+                <Route path='/phones' component={Phones}></Route>
+                <Route path='/categories/:id' component={Phones} />
+            </Route>
+            <Route exact path='/product/:id' component={ProductDetails}></Route>
+            <Route path="/basket" component={Basket} />
+       </Router>
+    </Provider>
+);
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+ReactDOM.render(jsx,document.getElementById('root'));
+

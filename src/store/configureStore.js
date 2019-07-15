@@ -13,24 +13,16 @@ import * as ProductSagas from '../sagas/Products';
 const sagaMiddleware = createSagaMiddleware();
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-
-
-// export default ()=>{
-    const store = createStore(
-        combineReducers({
-            routing:routerReducer,
-            phone: phoneReducer,
-            Product: productReducer,
-            PhonesPage: PhonesPage,
-            PhonePage: PhonePage,
-            Basket:Basket,
-            Categories: Categories
-        }),composeEnhancers(applyMiddleware(sagaMiddleware))
-    );
-    // return store;
-// };
-// console.log(rootSaga);
+const store = createStore(
+    combineReducers({
+        routing:routerReducer,
+        phone: phoneReducer,
+        Product: productReducer,
+        PhonesPage: PhonesPage,
+        PhonePage: PhonePage,
+        Basket:Basket,
+        Categories: Categories
+    }),composeEnhancers(applyMiddleware(sagaMiddleware))
+);
 sagaMiddleware.run(rootSaga);
-
 export default store;

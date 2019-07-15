@@ -1,0 +1,118 @@
+@import '../../assets/sharedassets/base';
+
+.datepicker-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5%;
+    font-family: Lato;
+    padding-bottom: 10px;
+	border-bottom: 1px solid #979797;
+
+    .datepicker-btn {
+        border: 1px solid #979797;
+        border-radius: 2px;
+        width: min-content;
+        margin: 0 auto;
+        span {
+            color: $vemba-grey;
+            font-size: 14px;
+            line-height: 17px;
+            text-transform: capitalize;
+        }
+    }
+    .datepicker-date-header {
+        text-transform: uppercase;
+        font-size: 21px;
+    	line-height: 25px;
+    }
+}
+.datepicker-container {
+    .react-datepicker {
+        font-family: Lato;
+        border: none;
+        background: transparent;
+        &__month {
+            margin: 0;
+        }
+        &__month-container {
+            width: 100%;
+        }
+        &__day{
+            &--selected{
+                background-color: $vemba-white;
+                border: 1px solid $vemba-purple;
+                border-radius: 3px;
+                color: $vemba-purple;
+                padding: 7px 4px !important;
+                margin: 3px !important;
+
+                &:hover {
+                    background: white;
+                }
+            }
+            &:hover {
+                background: transparent;
+            }
+            &--today {
+                font-weight: normal;
+            }
+            &-names{
+                .react-datepicker__day-name:first-child{
+                    padding-left:0;
+                    width:25px;
+                }
+            }
+            &-name {
+                font-weight: bold;
+            }
+            &--outside-month {
+                color: $vemba-grey;
+            }
+        }
+
+        &__week {
+            .react-datepicker__day:first-child{
+                padding-left: 0;
+                width: 25px;
+            }
+        }
+
+        &__day,
+        &__day-name,{
+            padding: 10px 8px;
+            font-size: 12px;
+            line-height: 15px;
+            margin: 0;
+            width:30px;
+        }
+        &__header {
+            background: none;
+            border: none;
+            text-align: left;
+            margin: 0;
+        }
+        &__current-month {
+            text-align: left;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 17px;
+            text-transform: uppercase;
+        }
+        &__day--highlighted-custom{
+            text-decoration: underline;
+            color: normal;
+        }
+        &__navigation{
+            &--next{
+                border-left-color: #aaa;
+            }
+            &--previous{
+                right: 40px;
+                left: initial;
+                border-right-color: #aaa;
+            }
+
+        }
+    }
+}

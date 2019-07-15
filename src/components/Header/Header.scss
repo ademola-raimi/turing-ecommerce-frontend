@@ -1,0 +1,62 @@
+@import '../../assets/sharedassets/base.scss';
+.App {
+    .app-bar {
+        box-shadow: none;
+        display: flex;
+        .tool-bar {
+            max-width: 1330px;
+            margin: 0 auto;
+            width: calc(100% - 32px); //default padding is 32px
+        }
+        .avatar-icon {
+            color: $vemba-black;
+            margin-right: 5px;
+        }
+        &-link {
+            text-decoration: none;
+
+        }
+        &-dropdown-button.app-bar-button {
+            padding-right: 0;
+        }
+        &-button {
+            font-size: 18px;
+            color: $vemba-grey;
+            text-transform: capitalize;
+        	border-left: 1px solid $vemba-lighter-grey;
+            padding: 20px 26px;
+        	font-family: Lato;
+            min-width: 135px;
+            &:hover {
+                border-radius: 0;
+            }
+            &:last-child {
+                padding-right: 0px;
+
+            }
+            &.selected {
+                color: $vemba-purple;
+            }
+        }
+        &-logo {
+            flex: 1;
+            &.logout-icon {
+                .company-logo {
+                    height: 65px;
+                    margin-top: 30px;
+                }
+            }
+            a:active {
+                color: $vemba-purple;
+            }
+            .company-logo {
+                height: 40px;
+                width: auto;
+                fill: $vemba-purple;
+                .cls-1{
+                    fill: $vemba-white;
+                }
+            }
+        }
+    }
+}

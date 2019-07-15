@@ -1,0 +1,12 @@
+.draggableItem.isDragging + .parent-card-container + div{
+        display:none !important;
+}
+
+.draggableItem .parent-card-container .card-badge{
+  top: 2px;
+  user-select: none;
+}
+
+.draggableItem:focus {
+    outline:none;
+}

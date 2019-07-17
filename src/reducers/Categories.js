@@ -1,7 +1,4 @@
 import {
-    FETCH_PRODUCTS,
-    FETCH_PRODUCTS_RECEIVED,
-    FETCH_PRODUCTS_FAILED,
     FETCH_CATEGORIES,
     FETCH_CATEGORIES_RECEIVED,
     FETCH_CATEGORIES_FAILED
@@ -41,9 +38,6 @@ export default function categoryReducer(state = initialState, action) {
             }
             // concatenate the array of videos returned to the existing list for infinite scroll
             const allCategories = _.concat(state.allCategories, action.response.data.data);
-
-            console.log('allCategories mmkkj: ',allCategories)
-
             newState = Object.assign({}, state, { isLoading: false, isProductsLoading: false, allCategories: allCategories, totalCategories: totalCategories });
             return newState;
 

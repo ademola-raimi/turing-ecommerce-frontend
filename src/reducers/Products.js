@@ -4,7 +4,10 @@ import {
     FETCH_PRODUCTS_FAILED,
     FETCH_PRODUCT,
     FETCH_PRODUCT_RECEIVED,
-    FETCH_PRODUCT_FAILED
+    FETCH_PRODUCT_FAILED,
+    FETCH_ATTRIBUTES,
+    FETCH_ATTRIBUTES_FAILED,
+    FETCH_ATTRIBUTES_RECEIVED
 } from '../actions/types';
 
 import _ from 'lodash';
@@ -27,6 +30,7 @@ const initialState = {
     totalRecords: 0,
     allCategories: [],
     isCategoriesLoading: true,
+    atrributes: []
   }
 
 export default function productReducer(state = initialState, action) {
@@ -45,23 +49,20 @@ export default function productReducer(state = initialState, action) {
             return newState;
 
         case FETCH_PRODUCT_RECEIVED:
-            // const totalProduct = action.response.data.total;
-            // reset if there is a new search or we need to see the full list again
-            // if(action.resetList){
-            //     state.allCategories = [];
-            // }
-            // concatenate the array of videos returned to the existing list for infinite scroll
-            // const allCategories = _.concat(state.allCategories, action.response.data.data);
-
-            console.log('product: ',action.response.data)
-
             newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, product: action.response.data });
             return newState;
 
+        case FETCH_ATTRIBUTES_RECEIVED:
+            console.log('ATTRIBUTES: ',action.response.data)
+            newState = Object.assign({}, state, { isLoading: false, atrributes: action.response.data });
+            return newState;
+
+        case FETCH_ATTRIBUTES:
         case FETCH_PRODUCT:
         case FETCH_PRODUCTS:
             return state;
 
+        case FETCH_ATTRIBUTES_FAILED:
         case FETCH_PRODUCT_FAILED:
         case FETCH_PRODUCTS_FAILED:
             newState = Object.assign({}, state, { isLoading:  false, hasError: true });

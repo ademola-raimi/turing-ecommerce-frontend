@@ -1,7 +1,7 @@
 import {
     FETCH_PRODUCTS,
-    FETCH_CATEGORIES,
-    FETCH_PRODUCT
+    FETCH_PRODUCT,
+    FETCH_ATTRIBUTES
 } from '../actions/types';
 
 // export const fetchAllSegments = (search_term, limit, offset, order, orderBy, page) => ({
@@ -32,8 +32,9 @@ export const fetchProducts = (
     resetList,
 });
 
-export const fetchCategories = () => ({
-    type: FETCH_CATEGORIES,
+export const fetchAttributes = (productId) => ({
+    type: FETCH_ATTRIBUTES,
+    productId
 });
 
 export const fetchProduct = (productId) => ({
@@ -41,7 +42,7 @@ export const fetchProduct = (productId) => ({
     productId
 });
 
-// export const saveSegment = (name, content, bumper) => ({
+// export const FETCH_ATTRIBUTES = (name, content, bumper) => ({
 //     type: SAVE_SEGMENT,
 //     content_type: [MEDIA_VID_TYPE],
 //     name,

@@ -6,10 +6,11 @@ import PhonePage from '../reducers/PhonePage';
 import {routerReducer} from 'react-router-redux';
 import Basket from '../reducers/Basket';
 import Categories from '../reducers/Categories';
+import ShoppingCartReducer from '../reducers/ShoppingCart';
 
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../sagas/rootSaga';
-import * as ProductSagas from '../sagas/Products';
+// import * as ProductSagas from '../sagas/Products';
 const sagaMiddleware = createSagaMiddleware();
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -21,7 +22,8 @@ const store = createStore(
         PhonesPage: PhonesPage,
         PhonePage: PhonePage,
         Basket:Basket,
-        Categories: Categories
+        Categories: Categories,
+        ShoppingCart: ShoppingCartReducer
     }),composeEnhancers(applyMiddleware(sagaMiddleware))
 );
 sagaMiddleware.run(rootSaga);

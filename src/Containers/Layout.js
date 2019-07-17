@@ -8,7 +8,6 @@ const Layout = ({children})=>{
         <div className="view-container">
             <div className="container">
                 <div className='row'>
-                    <Navbar/> 
                 </div>
                 
                 <div className="row">

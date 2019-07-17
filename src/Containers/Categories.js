@@ -70,7 +70,6 @@ import _ from 'lodash';
 
     render() {
         const { allCategories, activeCategoryId } = this.props.CategoryStore;
-        console.log('allCategories: ',allCategories);
         return (
             <div className="well">
                 <h4>Brand</h4>
@@ -78,7 +77,7 @@ import _ from 'lodash';
                     {this.renderAllCategory()}
                     {
                         allCategories.map((category,index)=>{
-                        console.log(category);
+
                         return this.renderCategory(category,index);
                     })
                 }

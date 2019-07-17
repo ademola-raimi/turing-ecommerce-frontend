@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-
-import { fetchProducts } from '../actions/Products';
 import {Link} from 'react-router';
 import _ from 'lodash';
 import R from 'ramda';
 import {loadMore,addproductToBasket} from '../actions/Phones';
 import api from '../config/config.js';
+import { fetchProducts, fetchAttributes } from '../actions/Products';
+import { fetchCartId } from '../actions/ShoppingCart';
 import Navbar from './Navbar';
 
-
 class Products extends Component {
-
     constructor (props) {
         super(props);
         this.state = {
@@ -31,34 +29,30 @@ class Products extends Component {
     renderProducts = (product,index)=>{
         const {addProductToBasket} = this.props;
         const shortDesc = `${R.take(60,product.description)}...`;
+
         return (
             <div className='col-sm-4 col-lg-4 col-md-4 book-list' key={index}>
                 <div className="thumbnail">
+                <Link to={`/product/${product.product_id}`}>
                     <img className='img-thumbnail'
                         src={api.cloudinary_path + product.thumbnail}
                         alt={product.name}
                     />
+                 </Link>
                 </div>
                 <div className="caption">
-                    <h4 className="pull-right">
-                        ${product.price}
-                    </h4>
                     <h4>
                         <Link to={`./product/${product.product_id}`}>
                             {product.name}
                         </Link>
                     </h4>
                     <p> {shortDesc}</p>
-                    <p className='itemButton'>
-                        <button className="btn btn-primary"
-                                onClick={()=>addProductToBasket(product.product_id)}>
-                            Buy Now
-                        </button>
-                        <Link to={`/product/${product.product_id}`}
-                            className="btn btn-default">
-                            More Info
-                        </Link>
-                    </p>
+                    <h4 >
+                        ${product.discounted_price == '0.00' ? product.price : product.discounted_price}
+                    </h4>
+                    <h4 ><strike>
+                        {product.discounted_price != '0.00' ? '$'+product.price : ''}
+                   </strike> </h4>
                 </div>
             </div>
         );
@@ -93,6 +87,7 @@ class Products extends Component {
 function mapStateToProps(state) {
     return {
         ProductsStore: state.Product,
+        ShoppingCartStore: state.ShoppingCart,
     };
 }
 
@@ -101,6 +96,8 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators(
             {
                 fetchProducts,
+                fetchAttributes,
+                fetchCartId
             },
             dispatch
         ),

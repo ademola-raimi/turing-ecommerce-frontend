@@ -9,7 +9,10 @@ import {
     FETCH_PRODUCTS_FAILED,
     FETCH_PRODUCT_RECEIVED,
     FETCH_PRODUCT_FAILED,
-    FETCH_PRODUCT
+    FETCH_PRODUCT,
+    FETCH_ATTRIBUTES,
+    FETCH_ATTRIBUTES_RECEIVED,
+    FETCH_ATTRIBUTES_FAILED
  } from '../actions/types';
 
 function* getProducts(action) {
@@ -55,7 +58,27 @@ function fetchProductApi(payload) {
     const { productId } = payload;
     return axios({
         method: "get",
-        url: api.api_path + api.version_path + api.products_path + '/' + productId,
+        url: api.api_path + api.version_path + api.products_path + '/' + productId + 'details',
+        crossdomain: true
+    });
+}
+
+function* getAttributes(action) {
+    try {
+        const response = yield call(fetchAttributesApi, action);
+        yield put({ type: FETCH_ATTRIBUTES_RECEIVED, response});
+    }
+    catch(error) {
+        yield put({ type: FETCH_ATTRIBUTES_FAILED, error });
+    }
+}
+
+function fetchAttributesApi(payload) {
+    console.log('payload: ',payload)
+    const { productId } = payload;
+    return axios({
+        method: "get",
+        url: api.api_path + api.version_path + api.attributes_path + '/inProduct/' + productId,
         crossdomain: true
     });
 }
@@ -66,4 +89,8 @@ export function* getProductsSaga() {
 
 export function* getProductSaga() {
     yield takeLatest(FETCH_PRODUCT, getProduct)
+}
+
+export function* getAttributesSaga() {
+    yield takeLatest(FETCH_ATTRIBUTES, getAttributes)
 }

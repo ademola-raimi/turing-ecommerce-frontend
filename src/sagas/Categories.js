@@ -21,7 +21,6 @@ function* getCategories(action) {
 }
 
 function fetchCategoriesApi(payload) {
-    console.log(api.api_path + api.version_path + api.categories_path)
     return axios({
         method: "get",
         url: api.api_path + api.version_path + api.categories_path,

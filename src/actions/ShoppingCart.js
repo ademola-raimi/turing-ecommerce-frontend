@@ -3,7 +3,10 @@ import {
     SAVE_CART,
     UPDATE_CART,
     FETCH_TOTAL_AMOUNT,
-    FETCH_CART_COUNT
+    FETCH_CART_COUNT,
+    FETCH_ALL_CARTS,
+    EMPTY_CARTS,
+    REMOVE_PRODUCT
 } from '../actions/types';
 
 export const fetchCartId = () => ({
@@ -31,3 +34,17 @@ export const totalPrice = () => ({
 export const totalCount = () => ({
     type: FETCH_CART_COUNT,
 });
+
+export const allCarts = () => ({
+    type: FETCH_ALL_CARTS,
+});
+
+export const emptyCart = () => ({
+    type: EMPTY_CARTS,
+});
+
+export const removeProduct = (itemId) => ({
+    type: REMOVE_PRODUCT,
+    itemId
+});
+

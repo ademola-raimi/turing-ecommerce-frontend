@@ -45,7 +45,7 @@ export default function categoryReducer(state = initialState, action) {
 
         case SAVE_CART_RECIEVED:
             localStorage.setItem("cartsInfo", JSON.stringify(action.response.data));
-            newState = Object.assign({}, state, { isLoading: false} );
+            newState = Object.assign({}, state, { isLoading: false, totalCartItem: action.response.data.length} );
             return newState;
 
         case TOTAL_AMOUNT_RECIEVED:
@@ -60,6 +60,7 @@ export default function categoryReducer(state = initialState, action) {
 
         case FETCH_ALL_CARTS_RECEIVED:
             console.log('all carts: ',action.response.data)
+            localStorage.setItem("cartsInfo", JSON.stringify(action.response.data));
             const isBasketEmpty = action.response.data.length > 0 ? false : true;
             newState = Object.assign({}, state, { isLoading: false, allCarts: action.response.data, isBasketEmpty: isBasketEmpty, removeProduct: false});
             return newState;
@@ -74,7 +75,6 @@ export default function categoryReducer(state = initialState, action) {
             return newState;
 
         case FETCH_ALL_CARTS_FAILED:
-            // console.log('git here: ',action.response.data)
             newState = Object.assign({}, state, { isLoading: false, isBasketEmpty: true});
             return newState;
 

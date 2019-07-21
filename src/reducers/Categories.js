@@ -10,10 +10,7 @@ const initialState = {
     hasError: false,
     isLoading: true,
     status: null,
-    isProductsLoading: true,
     isSaving: false,
-    allProducts: [],
-    totalProducts: 0,
     sort: {
         orderBy: 'updated_at',
         order: 'desc',
@@ -24,7 +21,6 @@ const initialState = {
     totalRecords: 0,
     allCategories: [],
     isCategoriesLoading: true,
-    activeCategoryId: 1
   }
 
 export default function categoryReducer(state = initialState, action) {
@@ -38,7 +34,7 @@ export default function categoryReducer(state = initialState, action) {
             }
             // concatenate the array of videos returned to the existing list for infinite scroll
             const allCategories = _.concat(state.allCategories, action.response.data.data);
-            newState = Object.assign({}, state, { isLoading: false, isProductsLoading: false, allCategories: allCategories, totalCategories: totalCategories });
+            newState = Object.assign({}, state, { isLoading: false, allCategories: allCategories, totalCategories: totalCategories });
             return newState;
 
         case FETCH_CATEGORIES:

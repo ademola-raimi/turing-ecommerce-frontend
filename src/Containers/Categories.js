@@ -5,6 +5,7 @@ import {Link,withRouter} from 'react-router';
 import {compose} from 'redux';
 import classNames from 'classnames';
 import { fetchCategories } from '../actions/Categories';
+import { fetchProductsCategory } from '../actions/Products';
 import R from 'ramda';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
@@ -21,7 +22,7 @@ import _ from 'lodash';
             searchTerm: null,
             selected: [],
             confirmDelete: false,
-            activeCategoryId: 1
+            activeCategoryId: null
         };
     }
 
@@ -30,51 +31,48 @@ import _ from 'lodash';
     }
 
     shouldComponentUpdate (nextProps, nextState, nextContent) {
-
-        
         return true;
     }
 
+    fetchProductCategory = (categoryId) => {
+        console.log(categoryId)
+        this.setState({
+            activeCategoryId: categoryId
+        })
+        this.props.actions.fetchProductsCategory(categoryId);
+    }
+
     renderCategory = (category,index)=>{
-        const getActiveState = R.propEq('id',this.state.activeCategoryId);
-        const linkClass = classNames({
-            "list-group-item" : true,
-            'active': getActiveState(category)
-        });
+        const linkClass = (this.state.activeCategoryId == category.category_id) ? "list-group-item active" : "list-group-item"
+        // const getActiveState = R.propEq('id',this.state.activeCategoryId);
+        // const linkClass = classNames({
+        //     "list-group-item" : true,
+        //     'active': getActiveState(category)
+        // });
         return(
-            <Link
-                to={`/categories/${category.id}`}
+            <a
+                href='#'
                 className={linkClass}
-                key={index}
+                onClick={()=>this.fetchProductCategory(category.category_id)}
             >
                 {category.name}
-            </Link>
-        );
-    };
-
-    renderAllCategory = ()=>{
-        const linkClass = classNames({
-            "list-group-item" : true,
-            active: R.isNil(this.state.activeCategoryId)
-        });
-
-        return (
-            <Link
-                to="/"
-                className={linkClass}
-            >
-            All
-            </Link>
+            </a>
         );
     };
 
     render() {
-        const { allCategories, activeCategoryId } = this.props.CategoryStore;
+        const { allCategories } = this.props.CategoryStore;
         return (
             <div className="well">
-                <h4>Brand</h4>
+                <h4>Categories</h4>
                 <div className="list-group">
-                    {this.renderAllCategory()}
+                    <a
+                        href='#'
+                        className={_.isNil(this.state.activeCategoryId) ? "list-group-item active" : "list-group-item"}
+                        onClick={()=>this.fetchProductCategory(null)}
+                    >
+                        All
+                    </a>
                     {
                         allCategories.map((category,index)=>{
 
@@ -96,7 +94,8 @@ function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators(
             {
-                fetchCategories
+                fetchCategories,
+                fetchProductsCategory
             },
             dispatch
         ),

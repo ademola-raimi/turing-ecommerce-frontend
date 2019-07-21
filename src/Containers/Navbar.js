@@ -37,7 +37,10 @@ export default function Navbar() {
 
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul className="nav navbar-nav">
-                <li className="active"><a href="/basket">BasketCart <span className="badge">{cartCount}</span></a></li>
+                <li className=""><a href="/basket">BasketCart <span className="badge">{cartCount}</span></a></li>
+              </ul>
+              <ul className="nav navbar-nav">
+                <li className=""><a href="/orders">Orders</a></li>
               </ul>
 
               <ul className="nav navbar-nav navbar-right">

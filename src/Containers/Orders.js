@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
-import R from 'ramda';
 import api from '../config/config.js';
 import { fetchOrders } from '../actions/Order';
 import Navbar from './Navbar';

@@ -1,11 +1,11 @@
 import React from 'react';
 import {Link} from 'react-router';
 import {connect} from 'react-redux';
-import {getTotalBasketCount,getTotalBasketPrice} from '../selectors/Phones';
+import { bindActionCreators } from 'redux';
 
 export const BasketCart = (props)=>{
-    // console.log("Props passed are ", props);
-    const {totalBasketCount,totalPrice} = props;
+    const {totalCartItem,totalAmount} = props.ShoppingCartStore;
+
     return(
         <div className="cart">
             <div className="dropdown">
@@ -15,18 +15,27 @@ export const BasketCart = (props)=>{
                     className="btn btn-inverse btn-block btn-large"
                 >
                     <i className="fa fa-fa-shopping-cart" />
-                    <span>{totalBasketCount} item(s) -{totalPrice}</span>
+                    <span>{totalCartItem} item(s) - {totalAmount}</span>
                 </Link>
             </div>
         </div>
     );
 };
 
-// export default BasketCart;
+function mapStateToProps(state) {
+    return {
+        ShoppingCartStore: state.ShoppingCart,
+    };
+}
 
-const mapStateToProps = (state)=>({
-    totalBasketCount: getTotalBasketCount(state),
-    totalPrice: getTotalBasketPrice(state)
-});
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(
+            {
+            },
+            dispatch
+        ),
+    };
+}
 
-export default connect(mapStateToProps)(BasketCart);
+export default connect(mapStateToProps,mapDispatchToProps)(BasketCart);

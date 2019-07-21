@@ -5,13 +5,6 @@ import { bindActionCreators } from 'redux';
 
 export const BasketCart = (props)=>{
     const {totalCartItem,totalAmount} = props.ShoppingCartStore;
-
-    console.log('from props totalAmount', props.totalAmount)
-    console.log('from props totalCartItem', props.totalCartItem)
-
-    console.log('from ShoppingCartStore totalAmount', props.ShoppingCartStore.totalAmount)
-    console.log('from ShoppingCartStore totalCartItem', props.ShoppingCartStore.totalCartItem)
-
     return(
         <div className="cart">
             <div className="dropdown">
@@ -21,7 +14,7 @@ export const BasketCart = (props)=>{
                     className="btn btn-inverse btn-block btn-large"
                 >
                     <i className="fa fa-fa-shopping-cart" />
-                    <span>{totalCartItem} item(s) - {totalAmount}</span>
+                    <span>{totalCartItem} item(s) - ${totalAmount}</span>
                 </Link>
             </div>
         </div>

@@ -6,17 +6,10 @@ import {
     FETCH_PRODUCTS_CATEGORY
 } from '../actions/types';
 
-export const fetchProducts = (
-    limit,
-    sort,
-    search_term,
-    resetList
-) => ({
+export const fetchProducts = (resetList, page) => ({
     type: FETCH_PRODUCTS,
-    limit,
-    sort,
-    search_term,
     resetList,
+    page
 });
 
 export const fetchAttributes = (productId) => ({
@@ -29,13 +22,17 @@ export const fetchProduct = (productId) => ({
     productId
 });
 
-export const searchProducts = (searchValue) => ({
+export const searchProducts = (resetList, searchValue, page) => ({
     type: SEARCH_PRODUCT,
-    searchValue
+    searchValue,
+    resetList,
+    page
 })
 
-export const fetchProductsCategory = (categoryId) => ({
+export const fetchProductsCategory = (resetList, categoryId, page) => ({
     type: FETCH_PRODUCTS_CATEGORY,
-    categoryId
+    resetList,
+    categoryId,
+    page
 })
 

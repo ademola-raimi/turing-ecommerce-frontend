@@ -1,6 +1,7 @@
 import { put, takeLatest, call } from 'redux-saga/effects';
 import { default as axios } from '../api/axios-api.js';
 import api from '../config/config.js';
+import _ from 'lodash';
 
 import {
     SAVE_CART,
@@ -14,7 +15,16 @@ import {
     TOTAL_AMOUNT_FAILED,
     FETCH_CART_COUNT,
     FETCH_CART_COUNT_RECIEVED,
-    FECTH_CART_COUNT_FAILED
+    FECTH_CART_COUNT_FAILED,
+    FETCH_ALL_CARTS,
+    FETCH_ALL_CARTS_RECEIVED,
+    FETCH_ALL_CARTS_FAILED,
+    EMPTY_CARTS,
+    EMPTY_CARTS_RECEIVED,
+    EMPTY_CARTS_FAILED,
+    REMOVE_PRODUCT,
+    REMOVE_PRODUCT_RECEIVED,
+    REMOVE_PRODUCT_FAILED
  } from '../actions/types';
 
 
@@ -48,9 +58,33 @@ function* saveCart(action) {
 }
 
 function saveCartApi(payload) {
+    let url;
+    let newPayload;
     localStorage.setItem("cartId", payload.cartId);
-    let url = api.api_path + api.version_path + api.shoppingCart_path + '/add';
-    let newPayload = {
+    // let cartsInfo = JSON.parse(localStorage.getItem('cartsInfo'));
+    // console.log('saga cartsInfo: ',cartsInfo)
+    // if (!_.isNil(cartsInfo)) {
+
+    //     _.forEach(cartsInfo, (cart) => {
+    //         if (cart.productId === payload.productId) {
+    //             url = api.api_path + api.version_path + api.shoppingCart_path + '/update/' + cart.itemId;
+    //             newPayload = {
+    //                 "quantity": cart.quantity + 1,
+    //             }
+    //         }
+    //     });
+    // } else {
+    //     url = api.api_path + api.version_path + api.shoppingCart_path + '/add';
+
+    //     newPayload = {
+    //         "cart_id": payload.cartId,
+    //         "product_id": payload.productId,
+    //         "attributes": payload.attributes,
+    //     }
+    // }
+    url = api.api_path + api.version_path + api.shoppingCart_path + '/add';
+
+    newPayload = {
         "cart_id": payload.cartId,
         "product_id": payload.productId,
         "attributes": payload.attributes,
@@ -70,7 +104,7 @@ function* getCartAmt(action) {
 }
 
 function fetchCartAmtApi(payload) {
-    let cartId = localStorage.getItem('cartId');;
+    let cartId = localStorage.getItem('cartId');
     return axios({
         method: "get",
         url: api.api_path + api.version_path + api.shoppingCart_path + '/totalAmount/' + cartId,
@@ -89,11 +123,69 @@ function* getCartCount(action) {
 }
 
 function fetchCartCountApi(payload) {
-    // console.log(api.api_path + api.version_path + api.shoppingCart_path + '/generateUniqueId');
-    let cartId = localStorage.getItem('cartId');;
+    let cartId = localStorage.getItem('cartId');
     return axios({
         method: "get",
         url: api.api_path + api.version_path + api.shoppingCart_path + '/totalCount/' + cartId,
+        crossdomain: true
+    });
+}
+
+function* getCarts(action) {
+    try {
+        const response = yield call(fetchCartsApi, action);
+        console.log(response)
+        yield put({ type: FETCH_ALL_CARTS_RECEIVED, response });
+    }
+    catch(error) {
+        yield put({ type: FETCH_ALL_CARTS_FAILED, error });
+    }
+}
+
+function fetchCartsApi(payload) {
+    let cartId = localStorage.getItem('cartId');
+    console.log(api.api_path + api.version_path + api.shoppingCart_path + '/' + cartId);
+    return axios({
+        method: "get",
+        url: api.api_path + api.version_path + api.shoppingCart_path + '/' + cartId,
+        crossdomain: true
+    });
+}
+
+function* emptyCarts(action) {
+    try {
+        const response = yield call(emptyCartsApi, action);
+        yield put({ type: EMPTY_CARTS_RECEIVED, response });
+    }
+    catch(error) {
+        yield put({ type: EMPTY_CARTS_FAILED, error });
+    }
+}
+
+function emptyCartsApi(payload) {
+    let cartId = localStorage.getItem('cartId');
+    return axios({
+        method: "delete",
+        url: api.api_path + api.version_path + api.shoppingCart_path + '/empty/' + cartId,
+        crossdomain: true
+    });
+}
+
+function* removeProduct(action) {
+    try {
+        const response = yield call(removeProductApi, action);
+        yield put({ type: REMOVE_PRODUCT_RECEIVED, response });
+    }
+    catch(error) {
+        yield put({ type: REMOVE_PRODUCT_FAILED, error });
+    }
+}
+
+function removeProductApi(payload) {
+    const { itemId } = payload;
+    return axios({
+        method: "delete",
+        url: api.api_path + api.version_path + api.shoppingCart_path + '/removeProduct/' + itemId,
         crossdomain: true
     });
 }
@@ -112,4 +204,16 @@ export function* getCartAmountSaga() {
 
 export function* getCartCountSaga() {
     yield takeLatest(FETCH_CART_COUNT, getCartCount)
+}
+
+export function* getCartsSaga() {
+    yield takeLatest(FETCH_ALL_CARTS, getCarts)
+}
+
+export function* emptyCartsSaga() {
+    yield takeLatest(EMPTY_CARTS, emptyCarts)
+}
+
+export function* removeProductSaga() {
+    yield takeLatest(REMOVE_PRODUCT, removeProduct)
 }

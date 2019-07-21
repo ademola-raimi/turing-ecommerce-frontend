@@ -20,7 +20,7 @@ class Search extends Component{
     handleSubmit = (e)=>{
         
         e.preventDefault();
-        this.props.actions.searchProducts(this.state.searchValue);
+        this.props.actions.searchProducts(true, this.state.searchValue);
     };
 
     onSearchInputChange = (e)=>{

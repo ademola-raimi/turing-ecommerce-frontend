@@ -36,19 +36,19 @@ import _ from 'lodash';
         this.setState({
             activeCategoryId: categoryId
         })
-        this.props.actions.fetchProductsCategory(categoryId);
+        this.props.actions.fetchProductsCategory(true, categoryId);
     }
 
     renderCategory = (category,index)=>{
         const linkClass = (this.state.activeCategoryId == category.category_id) ? "list-group-item active" : "list-group-item"
         return(
-            <a
-                href='#'
+            <Link
+                to='#'
                 className={linkClass}
                 onClick={()=>this.fetchProductCategory(category.category_id)}
             >
                 {category.name}
-            </a>
+            </Link>
         );
     };
 
@@ -58,13 +58,13 @@ import _ from 'lodash';
             <div className="well">
                 <h4>Categories</h4>
                 <div className="list-group">
-                    <a
-                        href='#'
+                    <Link
+                        to='#'
                         className={_.isNil(this.state.activeCategoryId) ? "list-group-item active" : "list-group-item"}
                         onClick={()=>this.fetchProductCategory(null)}
                     >
                         All
-                    </a>
+                    </Link>
                     {
                         allCategories.map((category,index)=>{
 

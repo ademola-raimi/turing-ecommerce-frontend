@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-// import {getCategories,getActiveCategoryId} from '../selectors/Phones';
 import {Link,withRouter} from 'react-router';
 import {compose} from 'redux';
 import classNames from 'classnames';
@@ -35,7 +34,6 @@ import _ from 'lodash';
     }
 
     fetchProductCategory = (categoryId) => {
-        console.log(categoryId)
         this.setState({
             activeCategoryId: categoryId
         })
@@ -44,11 +42,6 @@ import _ from 'lodash';
 
     renderCategory = (category,index)=>{
         const linkClass = (this.state.activeCategoryId == category.category_id) ? "list-group-item active" : "list-group-item"
-        // const getActiveState = R.propEq('id',this.state.activeCategoryId);
-        // const linkClass = classNames({
-        //     "list-group-item" : true,
-        //     'active': getActiveState(category)
-        // });
         return(
             <a
                 href='#'

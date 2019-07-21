@@ -7,8 +7,8 @@ module.exports = {
     categories_path: '/categories',
     attributes_path: '/attributes',
     shoppingCart_path: '/shoppingcart',
-    // rooms_path: '/rooms',
-    // room_path: '/room',
-    // priceLists_path: '/pricelists',
-    // priceList_path: '/pricelist'
+    customers_path: '/customers',
+    customer_path: '/customer',
+    shipping_path: '/shipping/regions',
+    orders_path: '/orders'
 }

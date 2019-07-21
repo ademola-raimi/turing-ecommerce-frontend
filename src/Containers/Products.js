@@ -4,11 +4,10 @@ import { bindActionCreators } from 'redux';
 import {Link} from 'react-router';
 import _ from 'lodash';
 import R from 'ramda';
-import {loadMore,addproductToBasket} from '../actions/Phones';
+import {loadMore} from '../actions/Phones';
 import api from '../config/config.js';
 import { fetchProducts, fetchAttributes } from '../actions/Products';
-import { fetchCartId } from '../actions/ShoppingCart';
-import Navbar from './Navbar';
+import { fetchCartId, totalPrice, totalCount } from '../actions/ShoppingCart';
 
 class Products extends Component {
     constructor (props) {
@@ -18,16 +17,30 @@ class Products extends Component {
             modalOpen: false,
             searchTerm: null,
             selected: [],
-            confirmDelete: false
+            confirmDelete: false,
+            products: []
         };
     }
 
     componentDidMount() {
         this.props.actions.fetchProducts();
+        this.props.actions.totalPrice();
+        this.props.actions.totalCount();
+    }
+
+    shouldComponentUpdate (nextProps, nextState, nextContent) {
+        if (!_.isEqual(nextProps.ProductsStore.allProducts, this.props.ProductsStore.allProducts)) {
+            if (nextProps.ProductsStore.allProducts.length > 0){
+                this.setState({
+                    products: nextProps.ProductsStore.allProducts,
+                })
+            }
+        }
+
+        return true;
     }
 
     renderProducts = (product,index)=>{
-        const {addProductToBasket} = this.props;
         const shortDesc = `${R.take(60,product.description)}...`;
 
         return (
@@ -59,13 +72,11 @@ class Products extends Component {
     };
 
     render(){
-        const {allProducts} = this.props.ProductsStore;
         return(
         <div>
-            
             <div className="books row">
                 {
-                    allProducts.map((product,index)=>{
+                    this.state.products.map((product,index)=>{
                         return this.renderProducts(product,index);
                     })
                 }
@@ -97,7 +108,9 @@ function mapDispatchToProps(dispatch) {
             {
                 fetchProducts,
                 fetchAttributes,
-                fetchCartId
+                fetchCartId,
+                totalPrice,
+                totalCount
             },
             dispatch
         ),

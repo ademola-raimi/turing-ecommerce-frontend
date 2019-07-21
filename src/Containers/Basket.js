@@ -1,38 +1,61 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import { getTotalBasketPrice,getBasketPhonesWithCount } from '../selectors/Phones';
+import { bindActionCreators } from 'redux';
 import R from 'ramda';
-import {removePhoneFromBasket,cleanBasket,basketCheckout} from '../actions/Phones';
-import {Link} from 'react-router';
+import { Link, browserHistory } from 'react-router';
+import _ from 'lodash';
+import api from '../config/config.js';
+import { allCarts, emptyCart, totalPrice, removeProduct } from '../actions/ShoppingCart';
 
-const Basket = ({phones,totalPrice,
-                removePhoneFromBasket,cleanBasket,
-                basketCheckout})=>{
-    // console.log(phones);
-    // console.log(totalPrice);
-    const isBasketEmpty = R.isEmpty(phones);
-    const renderContent = () => {
+class Basket extends Component {
+    constructor (props) {
+        super(props);
+        this.state = {
+            ...props,
+            modalOpen: false,
+            totalAmount: 0,
+            totalCartItem: 0
+        };
+    }
+
+    componentDidMount () {
+        this.props.actions.allCarts();
+        this.props.actions.totalPrice();
+    }
+
+    shouldComponentUpdate (nextProps, nextState, nextContent) {
+        if (!_.isEqual(nextProps.ShoppingCartStore.removeProduct, this.props.ShoppingCartStore.removeProduct)) {
+            if (nextProps.ShoppingCartStore.removeProduct) {
+                this.props.actions.allCarts();
+            }
+        }
+
+        return true;
+    }
+
+    renderContent = () => {
+        const {isBasketEmpty, allCarts, totalAmount} = this.props.ShoppingCartStore;
         return (
             <div>
                 {isBasketEmpty && <div> Your shopping cart is empty </div>}
                 <div className="table-responsive">
                     <table className="table-bordered table-striped table-condensed cf">
                         <tbody>
-                            {phones.map((phone,index)=>(
+                            {allCarts.map((cart,index)=>(
                                 <tr key={index}
                                     className="item-checout">
                                     <td className="first-column-checkout">
                                         <img className="img-thumbnail"
-                                            src={phone.image}
-                                            alt={phone.name}  
+                                            src={api.cloudinary_path + cart.image}
+                                            alt={cart.name}  
                                         />
                                     </td>
-                                    <td>{phone.name}</td>
-                                    <td>${phone.price}</td>
-                                    <td>{phone.count}</td>
+                                    <td>{cart.name}</td>
+                                    <td>${cart.price}</td>
+                                    <td>{cart.quantity}</td>
                                     <td>
                                         <span className="delete-cart"
-                                        onClick={()=>removePhoneFromBasket(phone.id)}></span>
+                                        onClick={()=>this.removeProductFromBasket(cart.item_id)}></span>
                                     </td>
                                 </tr>
                             ))}
@@ -44,72 +67,99 @@ const Basket = ({phones,totalPrice,
                     <div className="row">
                         <div className="pull-right total-user-checkout">
                             <b>Total:</b>
-                            ${totalPrice}
+                            ${totalAmount}
                         </div>
                     </div>
                 }
             </div>
-            )
-        };
+        );
+    }
 
-        const renderSidebar = ()=>{
-            return(
-                <div>   
-                    <Link
-                        className="btn btn-info"
-                        to="/"
-                    >
-                    <span className="glyphicon glyphicon-info-sign"/>
-                    <span> Continue Shopping</span>
-                    </Link>
-                    {
-                        R.not(isBasketEmpty) &&
-                        <div>
-                            <button className="btn btn-danger"
-                                    onClick={()=>cleanBasket()}        
-                            >
-                            <span className="glyphicon glyphicon-trash"/>
-                            Clean Cart
-                            </button>
-                            <button
-                                className="btn btn-success"
-                                onClick={()=>basketCheckout(phones)}
-                            >
-                            <span className="glyphicon glyphicon-envelope"/>
-                            Checkout
-                            </button>
-                        </div>
-                    }
-                </div>
-            );
-        };
+    cleanBasket = () => {
+        this.props.actions.emptyCart();
+        localStorage.removeItem('cartId');
+        localStorage.removeItem('cartsInfo');
+    }
 
-    return(
-        <div className="view-container">
-            <div className="container">
-                <div className="row">
-                    <div className="col-md-9">
-                        {renderContent()}
+    removeProductFromBasket = (itemId) => {
+        this.props.actions.removeProduct(itemId);
+    }
+
+    basketCheckout = () => {
+        return (
+                  browserHistory.push('/checkout')
+              )
+    }
+
+    renderSidebar = ()=>{
+        const {isBasketEmpty, allCarts} = this.props.ShoppingCartStore;
+        return (
+            <div>   
+                <Link
+                    className="btn btn-info"
+                    to="/"
+                >
+                <span className="glyphicon glyphicon-info-sign"/>
+                <span> Continue Shopping</span>
+                </Link>
+                {
+                    R.not(isBasketEmpty) &&
+                    <div>
+                        <button className="btn btn-danger"
+                                onClick={()=>this.cleanBasket()}        
+                        >
+                        <span className="glyphicon glyphicon-trash"/>
+                        Clean Cart
+                        </button>
+                        <button
+                            className="btn btn-success"
+                            onClick={()=>this.basketCheckout()}
+                        >
+                        <span className="glyphicon glyphicon-envelope"/>
+                        Checkout
+                        </button>
                     </div>
-                    <div className="col-md-3 btn-user-checkout">
-                        {renderSidebar()}
+                }
+            </div>
+        );
+    };
+
+    render() {
+        return(
+            <div className="view-container">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-9">
+                            {this.renderContent()}
+                        </div>
+                        <div className="col-md-3 btn-user-checkout">
+                            {this.renderSidebar()}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        );
     };
+}
 
+function mapStateToProps(state) {
+    return {
+        ShoppingCartStore: state.ShoppingCart,
+    };
+}
 
-const mapStateToProps = (state)=>({
-    phones: getBasketPhonesWithCount(state),
-    totalPrice: getTotalBasketPrice(state)
-});
-
-const mapDispatchToProps = (dispatch)=>({
-    removePhoneFromBasket: (id)=>dispatch(removePhoneFromBasket(id)),
-    cleanBasket: ()=>dispatch(cleanBasket()),
-    basketCheckout: (phones)=>dispatch(basketCheckout(phones))
-});
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(
+            {
+                allCarts,
+                emptyCart,
+                removeProduct,
+                totalPrice
+            },
+            dispatch
+        ),
+    };
+}
 
 export default connect(mapStateToProps,mapDispatchToProps)(Basket);

@@ -5,6 +5,7 @@ import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
 import { allCarts, emptyCart, totalPrice, removeProduct } from '../actions/ShoppingCart';
+import Navbar from './Navbar';
 
 class Basket extends Component {
     constructor (props) {
@@ -62,13 +63,14 @@ class Basket extends Component {
                     </table>
                 </div>
                 {
-                    isBasketEmpty &&
-                    <div className="row">
-                        <div className="pull-right total-user-checkout">
-                            <b>Total:</b>
-                            ${totalAmount}
+                    (!isBasketEmpty) && (
+                        <div className="row">
+                            <div className="pull-right total-user-checkout">
+                                <b>Total:</b>
+                                ${totalAmount}
+                            </div>
                         </div>
-                    </div>
+                    )
                 }
             </div>
         );
@@ -102,22 +104,23 @@ class Basket extends Component {
                 <span> Continue Shopping</span>
                 </Link>
                 {
-                    isBasketEmpty &&
-                    <div>
-                        <button className="btn btn-danger"
-                                onClick={()=>this.cleanBasket()}        
-                        >
-                        <span className="glyphicon glyphicon-trash"/>
-                        Clean Cart
-                        </button>
-                        <button
-                            className="btn btn-success"
-                            onClick={()=>this.basketCheckout()}
-                        >
-                        <span className="glyphicon glyphicon-envelope"/>
-                        Checkout
-                        </button>
-                    </div>
+                    (!isBasketEmpty) && (
+                        <div>
+                            <button className="btn btn-danger"
+                                    onClick={()=>this.cleanBasket()}        
+                            >
+                            <span className="glyphicon glyphicon-trash"/>
+                            Clean Cart
+                            </button>
+                            <button
+                                className="btn btn-success"
+                                onClick={()=>this.basketCheckout()}
+                            >
+                            <span className="glyphicon glyphicon-envelope"/>
+                            Checkout
+                            </button>
+                        </div>
+                    )
                 }
             </div>
         );
@@ -127,6 +130,7 @@ class Basket extends Component {
         return(
             <div className="view-container">
                 <div className="container">
+                    <Navbar/>
                     <div className="row">
                         <div className="col-md-9">
                             {this.renderContent()}

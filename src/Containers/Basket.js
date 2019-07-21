@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-import R from 'ramda';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
@@ -63,7 +62,7 @@ class Basket extends Component {
                     </table>
                 </div>
                 {
-                    R.not(isBasketEmpty) &&
+                    isBasketEmpty &&
                     <div className="row">
                         <div className="pull-right total-user-checkout">
                             <b>Total:</b>
@@ -103,7 +102,7 @@ class Basket extends Component {
                 <span> Continue Shopping</span>
                 </Link>
                 {
-                    R.not(isBasketEmpty) &&
+                    isBasketEmpty &&
                     <div>
                         <button className="btn btn-danger"
                                 onClick={()=>this.cleanBasket()}        

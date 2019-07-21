@@ -3,8 +3,6 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Link} from 'react-router';
 import _ from 'lodash';
-import R from 'ramda';
-import {loadMore} from '../actions/Phones';
 import api from '../config/config.js';
 import { fetchProducts, fetchAttributes } from '../actions/Products';
 import { fetchCartId, totalPrice, totalCount } from '../actions/ShoppingCart';
@@ -41,8 +39,6 @@ class Products extends Component {
     }
 
     renderProducts = (product,index)=>{
-        const shortDesc = `${R.take(60,product.description)}...`;
-
         return (
             <div className='col-sm-4 col-lg-4 col-md-4 book-list' key={index}>
                 <div className="thumbnail">
@@ -59,7 +55,7 @@ class Products extends Component {
                             {product.name}
                         </Link>
                     </h4>
-                    <p> {shortDesc}</p>
+                    <p> {product.description}</p>
                     <h4 >
                         ${product.discounted_price == '0.00' ? product.price : product.discounted_price}
                     </h4>
@@ -70,6 +66,10 @@ class Products extends Component {
             </div>
         );
     };
+
+    loadMore = () => {
+        
+    }
 
     render(){
         return(
@@ -84,7 +84,7 @@ class Products extends Component {
             <div className="row">
                 <div className="col-md-12">
                     <button className="pull-right btn btn-primary"
-                            onClick={loadMore}>
+                            onClick={this.loadMore()}>
                         Load More
                     </button>
                 </div>

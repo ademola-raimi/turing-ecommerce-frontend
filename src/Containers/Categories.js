@@ -5,7 +5,6 @@ import {compose} from 'redux';
 import classNames from 'classnames';
 import { fetchCategories } from '../actions/Categories';
 import { fetchProductsCategory } from '../actions/Products';
-import R from 'ramda';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
 

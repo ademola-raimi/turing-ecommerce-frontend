@@ -20,13 +20,11 @@ class Search extends Component{
     handleSubmit = (e)=>{
         
         e.preventDefault();
-        console.log("state",this.state.searchValue);
         this.props.actions.searchProducts(this.state.searchValue);
     };
 
     onSearchInputChange = (e)=>{
         const searchValue = e.target.value;
-        console.log('something here',searchValue);
         this.setState({
             searchValue
         });

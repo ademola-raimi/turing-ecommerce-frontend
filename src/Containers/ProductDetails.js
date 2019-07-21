@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {fetchPhoneById,addPhoneToBasket} from '../actions/Phones';
-import {getPhonesById} from '../selectors/Phones';
-import R from 'ramda';
 import _ from 'lodash';
 import BasketCart  from './BasketCart';
 import {Link} from 'react-router';

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-import R from 'ramda';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
@@ -35,7 +34,6 @@ class Login extends Component {
     }
 
     renderRedirect() {
-        //TO-DO: require refactoring into a component after saving functionality is finished
         if (this.props.CustomerStore.authenticated) {
               return (
                   browserHistory.push('/')

@@ -61,6 +61,7 @@ class ProductDetails extends Component {
         }
 
         if (!_.isEqual(nextProps.ShoppingCartStore.totalCartItem, this.props.ShoppingCartStore.totalCartItem)) {
+            this.props.actions.totalPrice();
             this.setState({
                 totalCartItem: nextProps.ShoppingCartStore.totalCartItem,
             })
@@ -110,8 +111,8 @@ class ProductDetails extends Component {
     handleValidation = () => {
         let {selectedColor, selectedSize} = this.state;
         let errors = {};
+        let attr = "Not specify";
         let formIsValid = true;
-
         if (!selectedSize || selectedSize == "Select size") {
             formIsValid = false;
             errors["size"] = 'Size is required.';
@@ -120,7 +121,14 @@ class ProductDetails extends Component {
             formIsValid = false;
             errors["color"] = 'Color is required.';
         }
-
+        if (this.state.sizes.length === 0 ) {
+            errors = {};
+            formIsValid = true;
+        }
+        if (this.state.colors.length === 0 ) {
+            errors = {};
+            formIsValid = true;
+        }
         this.setState({errors: errors});
         return formIsValid;
     }
@@ -128,26 +136,24 @@ class ProductDetails extends Component {
     addProductToCart = (productId) => {
         if (this.handleValidation()) {
             const {cartId, selectedSize, selectedColor} = this.state;
-            const attributes = selectedSize + " " + selectedColor;
+            let attributes = selectedSize + " " + selectedColor;
+            if (attributes == " ") {
+                attributes = "Not specify";
+            }
+
             this.props.actions.saveCart(productId, cartId, attributes);
-            this.props.actions.totalPrice();
-            this.props.actions.totalCount();
         }
     }
 
     renderSideBar = ()=>{
         const {product} = this.props.ProductsStore;
-
         return(
             <div>
                <div>
                     <p className='lead'> Quick Shop</p>
                     <div className="cart">
                         <div className="dropdown">
-                            <BasketCart
-                                totalCartItem={this.state.totalCartItem}
-                                totalAmount={this.state.totalAmount}
-                            />
+                            <BasketCart/>
                         </div>
                     </div>
                     <div className='form-group'>

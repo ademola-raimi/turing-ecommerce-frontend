@@ -4,7 +4,8 @@ import { bindActionCreators } from 'redux';
 import {Link} from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
-import { fetchProducts, fetchAttributes } from '../actions/Products';
+import debounce from "lodash.debounce";
+import { fetchProducts, fetchAttributes, fetchProductsCategory, searchProducts } from '../actions/Products';
 import { fetchCartId, totalPrice, totalCount } from '../actions/ShoppingCart';
 
 class Products extends Component {
@@ -16,12 +17,32 @@ class Products extends Component {
             searchTerm: null,
             selected: [],
             confirmDelete: false,
-            products: []
+            products: [],
+            error: false,
+            hasMore: true,
+            isLoading: false,
         };
+
+        // Binds our scroll event handler
+        window.onscroll = debounce(() => {
+            const {error, isLoading, hasMore, fetchProductsCategory, fetchProductssearch, page, categoryPage, searchValue, searchPage, activeCategoryId} = this.props.ProductsStore;
+            if (error || isLoading || !hasMore) return;
+
+          // Checks that the page has scrolled to the bottom
+            if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight) {
+                if (fetchProductsCategory) {
+                    this.props.actions.fetchProductsCategory(false, activeCategoryId, categoryPage);
+                } else if (fetchProductssearch) {
+                    this.props.actions.searchProducts(false, searchValue, searchPage);
+                } else {
+                    this.props.actions.fetchProducts(false, page);
+                }
+            }
+        }, 100);
     }
 
     componentDidMount() {
-        this.props.actions.fetchProducts();
+        this.props.actions.fetchProducts(true);
         this.props.actions.totalPrice();
         this.props.actions.totalCount();
     }
@@ -33,6 +54,13 @@ class Products extends Component {
                     products: nextProps.ProductsStore.allProducts,
                 })
             }
+        }
+
+        if (!_.isEqual(nextProps.ProductsStore.hasMore, this.props.ProductsStore.hasMore)) {
+            console.log('has more compo...',nextProps.ProductsStore.hasMore)
+            this.setState({
+                    products: nextProps.ProductsStore.allProducts,
+                })
         }
 
         return true;
@@ -67,10 +95,6 @@ class Products extends Component {
         );
     };
 
-    loadMore = () => {
-        
-    }
-
     render(){
         return(
         <div>
@@ -83,10 +107,6 @@ class Products extends Component {
             </div>
             <div className="row">
                 <div className="col-md-12">
-                    <button className="pull-right btn btn-primary"
-                            onClick={this.loadMore()}>
-                        Load More
-                    </button>
                 </div>
 
             </div>
@@ -110,7 +130,9 @@ function mapDispatchToProps(dispatch) {
                 fetchAttributes,
                 fetchCartId,
                 totalPrice,
-                totalCount
+                totalCount,
+                fetchProductsCategory,
+                searchProducts
             },
             dispatch
         ),

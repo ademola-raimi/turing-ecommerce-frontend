@@ -26,31 +26,36 @@ const initialState = {
     isSaving: false,
     allProducts: [],
     totalProducts: 0,
-    sort: {
-        orderBy: 'updated_at',
-        order: 'desc',
-        limit: 20,
-        offset: 0,
-        page: 0
-    },
     totalRecords: 0,
     allCategories: [],
     isCategoriesLoading: true,
-    atrributes: []
+    atrributes: [],
+    hasMore: true,
+    fetchProductsCategory: false,
+    fetchProductssearch: false,
+    activeCategoryId: null,
+    searchValue: null,
+    categoryPage: 1,
+    searchPage: 1,
+    page: 1
   }
 
 export default function productReducer(state = initialState, action) {
     let newState = state;
+    let allProducts;
     switch (action.type) {
         case FETCH_PRODUCTS_RECEIVED:
-            let totalProducts = action.response.data.total;
             // reset if there is a new search or we need to see the full list again
             if(action.resetList){
                 state.allProducts = [];
             }
+            if (action.response.data.data.length == 0) {
+                 state.hasMore = false
+            }
+            state.page += 1
             // concatenate the array of videos returned to the existing list for infinite scroll
-            let allProducts = _.concat(state.allProducts, action.response.data.data);
-            newState = Object.assign({}, state, { isLoading: false, isCategoriesLoading: false, allProducts: allProducts, totalProducts: totalProducts });
+             allProducts = _.concat(state.allProducts, action.response.data.data);
+            newState = Object.assign({}, state, { isLoading: false, isCategoriesLoading: false, allProducts: allProducts, });
             return newState;
 
         case FETCH_PRODUCT_RECEIVED:
@@ -58,23 +63,23 @@ export default function productReducer(state = initialState, action) {
             return newState;
 
         case SEARCH_PRODUCT_RECEIVED:
-            // totalProducts = action.response.data.total;
-            // console.log("totalProducts: ",totalProducts)
-
+            if (action.resetList) {
+                state.allProducts = [];
+            }
+            state.searchPage += 1
             // concatenate the array of videos returned to the existing list for infinite scroll
-            // allProducts = _.concat(state.allProducts, action.response.data.data);
-            // console.log("all products: ",allProducts)
-            newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: action.response.data.data, totalProducts: action.response.data.total });
+            allProducts = _.concat(state.allProducts, action.response.data.data);
+            newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: allProducts, fetchProductsCategory: false, fetchProductssearch: true, searchValue: action.searchValue});
             return newState;
 
         case FETCH_PRODUCTS_CATEGORY_RECEIVED:
-            // totalProducts = action.response.data.total;
-            // console.log("totalProducts: ",totalProducts)
-
+            if (action.resetList) {
+                state.allProducts = [];
+            }
+            state.categoryPage += 1
             // concatenate the array of videos returned to the existing list for infinite scroll
-            // allProducts = _.concat(state.allProducts, action.response.data.data);
-            // console.log("all products: ",allProducts)
-            newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: action.response.data.data, totalProducts: action.response.data.total });
+            allProducts = _.concat(state.allProducts, action.response.data.data);
+            newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: allProducts, fetchProductsCategory: true, fetchProductssearch: false, activeCategoryId: action.categoryId});
             return newState;
 
         case FETCH_ATTRIBUTES_RECEIVED:

@@ -32,16 +32,12 @@ function* getProducts(action) {
 }
 
 function fetchProductsApi(payload) {
-    // console.log('payload: ',api.api_path + api.version_path + api.products_path)
     // build the params based on available content in payload
     // this will work for searching and displaying the full list of videos
     let params = {};
-    // params.content_type = payload.content_type;
-    // if(payload.limit) params.limit = payload.limit;
-    // if(payload.offset >= 0) params.offset = payload.offset;
-    // if(payload.search_term) params.search_term = payload.search_term;
-    // if(payload.sort && !params.search_term) params.sort = payload.sort;
-    // if(payload.producer_id.length  > 0) params.producer_id = payload.producer_id;
+    if (payload.page) params.page = payload.page;
+    params.description_length = 50;
+    params.limit = 10;
     return axios({
         method: "get",
         url: api.api_path + api.version_path + api.products_path,
@@ -93,7 +89,7 @@ function fetchAttributesApi(payload) {
 function* searchProducts(action) {
     try {
         const response = yield call(searchProductsApi, action);
-        yield put({ type: SEARCH_PRODUCT_RECEIVED, response });
+        yield put({ type: SEARCH_PRODUCT_RECEIVED, response, resetList: action.resetList, searchValue: action.searchValue });
     }
     catch(error) {
         yield put({ type: SEARCH_PRODUCT_FAILED, error });
@@ -101,22 +97,19 @@ function* searchProducts(action) {
 }
 
 function searchProductsApi(payload) {
-    // console.log('payload: ',api.api_path + api.version_path + api.products_path)
     // build the params based on available content in payload
     // this will work for searching and displaying the full list of videos
     let params = {};
     let url;
+    if (payload.page) params.page = payload.page;
     if (payload.searchValue) {
         params.query_string = payload.searchValue;
         url = api.api_path + api.version_path + api.products_path + '/search'
     } else {
         url = api.api_path + api.version_path + api.products_path
     }
-    // if(payload.limit) params.limit = payload.limit;
-    // if(payload.offset >= 0) params.offset = payload.offset;
-    // if(payload.search_term) params.search_term = payload.search_term;
-    // if(payload.sort && !params.search_term) params.sort = payload.sort;
-    // if(payload.producer_id.length  > 0) params.producer_id = payload.producer_id;
+    params.description_length = 50;
+    params.limit = 10;
     return axios({
         method: "get",
         url: url,
@@ -130,7 +123,7 @@ function searchProductsApi(payload) {
 function* fetchProductsCategory(action) {
     try {
         const response = yield call(fetchProductsCategoryApi, action);
-        yield put({ type: FETCH_PRODUCTS_CATEGORY_RECEIVED, response });
+        yield put({ type: FETCH_PRODUCTS_CATEGORY_RECEIVED, response, resetList: action.resetList, categoryId: action.categoryId });
     }
     catch(error) {
         yield put({ type: FETCH_PRODUCTS_CATEGORY_FAILED, error });
@@ -139,21 +132,18 @@ function* fetchProductsCategory(action) {
 
 function fetchProductsCategoryApi(payload) {
     const { categoryId } = payload
-    // console.log('payload: ',api.api_path + api.version_path + api.products_path)
     // build the params based on available content in payload
     // this will work for searching and displaying the full list of videos
     let params = {};
     let url;
+    if (payload.page) params.page = payload.page;
     if (payload.categoryId != null) {
         url =api.api_path + api.version_path + api.products_path + '/inCategory/' + categoryId;
     } else {
         url = api.api_path + api.version_path + api.products_path
     }
-    // if(payload.limit) params.limit = payload.limit;
-    // if(payload.offset >= 0) params.offset = payload.offset;
-    // if(payload.search_term) params.search_term = payload.search_term;
-    // if(payload.sort && !params.search_term) params.sort = payload.sort;
-    // if(payload.producer_id.length  > 0) params.producer_id = payload.producer_id;
+    params.description_length = 50;
+    params.limit = 10;
     return axios({
         method: "get",
         url: url,

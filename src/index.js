@@ -5,12 +5,8 @@ import store from './store/configureStore';
 import {Provider} from 'react-redux';
 import {browserHistory,Router,Route} from 'react-router';
 import {syncHistoryWithStore} from 'react-router-redux';
-import Layout from './Containers/Layout';
-import Phones from './Containers/Phones';
-import Phone from './Containers/Phone';
-import Basket from './Containers/Basket';
-import Products from './Containers/Products';
-import ProductDetails from './Containers/ProductDetails';
+import { Layout, Basket, Products, ProductDetails, Login, Register, Checkout, Orders, OrderDetails } from './Containers';
+import {Elements, StripeProvider} from 'react-stripe-elements';
 
 const history = syncHistoryWithStore(browserHistory,store);
 const jsx = (
@@ -19,11 +15,16 @@ const jsx = (
             <Route component={Layout}>
                 <Route exact path="/" component={Products}/>
                 <Route path='/products' component={Products}></Route>
-                <Route path='/phones' component={Phones}></Route>
-                <Route path='/categories/:id' component={Phones} />
+                <Route path='/categories/:id' component={Products} />
             </Route>
             <Route exact path='/product/:id' component={ProductDetails}></Route>
             <Route path="/basket" component={Basket} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/register" component={Register} />
+
+            <Route exact path="/checkout" component={Checkout} />
+            <Route exact path="/orders" component={Orders} />
+            <Route exact path="/order/:id" component={OrderDetails} />
        </Router>
     </Provider>
 );

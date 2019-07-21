@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {searchPhone} from '../actions/Phones';
+import { bindActionCreators } from 'redux';
+import { searchProducts } from '../actions/Products';
 
-class Search extends React.Component{
+class Search extends Component{
 
     constructor(props){
         super(props);
@@ -19,12 +20,13 @@ class Search extends React.Component{
     handleSubmit = (e)=>{
         
         e.preventDefault();
-        this.props.searchPhone(this.state.searchValue);
+        console.log("state",this.state.searchValue);
+        this.props.actions.searchProducts(this.state.searchValue);
     };
 
     onSearchInputChange = (e)=>{
         const searchValue = e.target.value;
-        // console.log("Handling submit : ", searchValue);
+        console.log('something here',searchValue);
         this.setState({
             searchValue
         });
@@ -45,22 +47,33 @@ class Search extends React.Component{
                             value={this.state.searchValue}    
                             onChange={this.onSearchInputChange}
                         />
-                    </form>
-                    <span className="input-group-btn">
+                        <span className="input-group-btn search-gly">
                         <button className="btn btn-default">
                             <span className="glyphicon glyphicon-search" />
                         </button>
                     </span>
+                    </form>
                 </div>
             </div>
         );
     };
 };
 
-// export default Search;
+function mapStateToProps(state) {
+    return {
+        ProductsStore: state.Product,
+    };
+}
 
-const mapDispatchToProps = (dispatch)=>({
-    searchPhone: (text)=>dispatch(searchPhone(text))
-});
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(
+            {
+                searchProducts
+            },
+            dispatch
+        ),
+    };
+}
 
-export default connect(undefined, mapDispatchToProps)(Search);
+export default connect(mapStateToProps,mapDispatchToProps)(Search);

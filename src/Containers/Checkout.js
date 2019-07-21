@@ -88,7 +88,8 @@ class Checkout extends Component {
                         eve_phone: activeCustomer.eve_phone,
                         credit_card: activeCustomer.credit_card,
                         mob_phone: activeCustomer.mob_phone,
-                    }
+                    },
+                    totalAmount: nextProps.ShoppingCartStore.totalAmount
                 })
         }
 

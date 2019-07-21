@@ -5,12 +5,13 @@ import {fetchPhoneById,addPhoneToBasket} from '../actions/Phones';
 import {getPhonesById} from '../selectors/Phones';
 import R from 'ramda';
 import _ from 'lodash';
-// import BasketCart  from './BasketCart';
+import BasketCart  from './BasketCart';
 import {Link} from 'react-router';
 import { fetchProduct, fetchAttributes } from '../actions/Products';
 import { fetchCartId, saveCart, totalPrice, totalCount } from '../actions/ShoppingCart';
 import api from '../config/config.js';
 import { formatAttributes } from '../helpers/helper';
+import Navbar from './Navbar';
 
 class ProductDetails extends Component {
     constructor (props) {
@@ -24,13 +25,14 @@ class ProductDetails extends Component {
             selectedColor: '',
             selectedSize: '',
             totalAmount: 0,
-            totalCartItem: 0
+            totalCartItem: 0,
+            errors: {}
         };
     }
 
     componentDidMount = () => {
-        this.props.actions.fetchProduct(this.props.params.id);
         this.props.actions.fetchAttributes(this.props.params.id);
+        this.props.actions.fetchProduct(this.props.params.id);
         this.props.actions.fetchCartId();
         this.props.actions.totalPrice();
         this.props.actions.totalCount();
@@ -50,8 +52,6 @@ class ProductDetails extends Component {
             //if user navigated to the same page, for example,
             //clicking same tab
             let cartId = localStorage.getItem('cartId');
-            console.log('cartId storage:',cartId)
-            console.log('cartId normal:',nextProps.ShoppingCartStore.cartId)
             this.setState({
                 cartId: !_.isNil(cartId) ? cartId : nextProps.ShoppingCartStore.cartId,
             })
@@ -72,35 +72,6 @@ class ProductDetails extends Component {
         return true;
     }
 
-    renderFields = ()=>{
-        const {product} = this.props.ProductsStore;
-        const columnFields = R.compose(
-            R.toPairs,
-            R.pick([
-                'cpu',
-                'camera',
-                'size',
-                'weight',
-                'display',
-                'battery',
-                'memory'
-            ])
-        )(product);
-        return columnFields.map(([key,value])=>{
-            return(
-                <div className='column' key={key}>
-                    <div className='ab-details-title'>
-                        <p> { key } </p>
-                    </div>
-                    <div className='ab-details-info'>
-                        <p> { value } </p>
-                    </div>
-                </div>
-            );
-           
-        });
-    };
-
     renderContent = ()=>{
         const {product} = this.props.ProductsStore;
         return(
@@ -114,7 +85,6 @@ class ProductDetails extends Component {
 
                     </div>
                     <div className="col-md-6">
-                        {this.renderFields()}
                     </div>
                 </div>
                 <div className='caption-full'>
@@ -141,17 +111,36 @@ class ProductDetails extends Component {
         })
     }
 
+    handleValidation = () => {
+        let {selectedColor, selectedSize} = this.state;
+        let errors = {};
+        let formIsValid = true;
+
+        if (!selectedSize || selectedSize == "Select size") {
+            formIsValid = false;
+            errors["size"] = 'Size is required.';
+        }
+         if (!selectedSize || selectedSize == "Select color") {
+            formIsValid = false;
+            errors["color"] = 'Color is required.';
+        }
+
+        this.setState({errors: errors});
+        return formIsValid;
+    }
+
     addProductToCart = (productId) => {
-        const {cartId, selectedSize, selectedColor} = this.state;
-        const attributes = selectedSize + " " + selectedColor;
-        this.props.actions.saveCart(productId, cartId, attributes);
-        this.props.actions.totalPrice();
-        this.props.actions.totalCount();
+        if (this.handleValidation()) {
+            const {cartId, selectedSize, selectedColor} = this.state;
+            const attributes = selectedSize + " " + selectedColor;
+            this.props.actions.saveCart(productId, cartId, attributes);
+            this.props.actions.totalPrice();
+            this.props.actions.totalCount();
+        }
     }
 
     renderSideBar = ()=>{
-        
-        const {product, addPhoneToBasket} = this.props.ProductsStore;
+        const {product} = this.props.ProductsStore;
 
         return(
             <div>
@@ -159,14 +148,7 @@ class ProductDetails extends Component {
                     <p className='lead'> Quick Shop</p>
                     <div className="cart">
                         <div className="dropdown">
-                            <Link
-                                to="/basket"
-                                id="dLabel"
-                                className="btn btn-inverse btn-block btn-large"
-                            >
-                                <i className="fa fa-fa-shopping-cart" />
-                                <span>{this.state.totalCartItem} item(s) - ${this.state.totalAmount}</span>
-                            </Link>
+                            <BasketCart/>
                         </div>
                     </div>
                     <div className='form-group'>
@@ -179,20 +161,25 @@ class ProductDetails extends Component {
                                 {product.discounted_price != '0.00' ? '$'+product.price : ''}
                             </strike>
                        </h2>
-
+                       <div className='form-group'>
                        <select onChange={this.handleSizeChange}  className="form-inline">
-                           <option value="">select size</option>
+                           <option value="">Select size</option>
                            {this.state.sizes.map((size) => {
                                 return <option name={size} value={size}>{size}</option>;
                            })}
                        </select>
+                       </div>
 
+                       <span className="form-error"><strong>{this.state.errors["size"]}</strong></span>
+                       <div className='form-group'>
                        <select onChange={this.handleColorChange} className="form-inline">
-                           <option value="">select color</option>
+                           <option value="">Select color</option>
                            {this.state.colors.map((color) => {
                                 return <option name={color} value={color}>{color}</option>;
                            })}
                        </select>
+                       </div>
+                       <span className="form-error"><strong>{this.state.errors["color"]}</strong></span>
                     </div>
                </div>
                <Link to="/"
@@ -213,6 +200,7 @@ class ProductDetails extends Component {
         return(
             <div className='view-container'>
                 <div className='container'>
+                    <Navbar/>
                     <div className='col-md-9'>
                         {product && this.renderContent()}
                     </div>
@@ -225,7 +213,6 @@ class ProductDetails extends Component {
     }
 }
 
-// export default Phone;
 function mapStateToProps(state) {
     return {
         ProductsStore: state.Product,

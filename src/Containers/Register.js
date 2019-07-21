@@ -6,6 +6,7 @@ import _ from 'lodash';
 import api from '../config/config.js';
 import { registerCustomer } from '../actions/Customers'
 import { validateEmail } from '../helpers/helper';
+import NotificationSnackbar from "./NotificationSnackbar";
 
 class Register extends Component {
     constructor (props) {
@@ -44,15 +45,12 @@ class Register extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        console.log('validation sucess: ',this.handleValidation());
         if (this.handleValidation()) {
           let payload={
             "name":this.state.name,
             "email":this.state.email,
             "password":this.state.password,
           }
-          console.log('payload: ',payload);
-          console.log(this.props.actions)
           this.props.actions.registerCustomer(payload);
         }
       }
@@ -93,13 +91,20 @@ class Register extends Component {
     }
 
   renderRedirect() {
-      if (this.props.CustomerStore.registerSuccess) {
+      const { registerSuccess, hasError, message } = this.props.CustomerStore  
+      if (registerSuccess) {
             return (
                 browserHistory.push('/login')
             )
-       } else {
+       } else if (hasError) {
+            return (
+              <NotificationSnackbar
+                message={message}
+              />
+            )
+        } else {
           return null
-      }
+        }
   }
 
     render() {

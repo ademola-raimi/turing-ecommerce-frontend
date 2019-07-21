@@ -79,7 +79,6 @@ class ProductDetails extends Component {
                             src={api.cloudinary_path + product.image}
                             alt={product.name}
                         />
-
                     </div>
                     <div className="col-md-6">
                     </div>
@@ -145,7 +144,10 @@ class ProductDetails extends Component {
                     <p className='lead'> Quick Shop</p>
                     <div className="cart">
                         <div className="dropdown">
-                            <BasketCart/>
+                            <BasketCart
+                                totalCartItem={this.state.totalCartItem}
+                                totalAmount={this.state.totalAmount}
+                            />
                         </div>
                     </div>
                     <div className='form-group'>

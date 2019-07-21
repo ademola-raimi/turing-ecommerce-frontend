@@ -4,12 +4,18 @@ import { bindActionCreators } from 'redux';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
-import { fetchToken } from '../actions/Customers'
+import { fetchToken } from '../actions/Customers';
+import ReactSnackBar from "react-js-snackbar";
+import NotificationSnackbar from "./NotificationSnackbar";
 
 class Login extends Component {
     constructor (props) {
         super(props);
-        this.state = { ...props, email: '', password: '' };
+        this.state = {
+            ...props,
+            email: '',
+            password: '',
+        };
 
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -34,12 +40,19 @@ class Login extends Component {
     }
 
     renderRedirect() {
-        if (this.props.CustomerStore.authenticated) {
+        const { authenticated, hasError } = this.props.CustomerStore  
+        if (authenticated) {
               return (
                   browserHistory.push('/')
               )
-         } else {
-            return null
+         } else if (hasError) {
+            return (
+              <NotificationSnackbar
+                message="Authentication Failed"
+              />
+            )
+        } else {
+          return null
         }
     }
 
@@ -57,7 +70,6 @@ class Login extends Component {
                           <label htmlFor="Password">Password</label>
                           <input type="password" className="form-control" placeholder="Password" name="password"  value={this.state.password} onChange={this.handlePasswordChange} type="password" id="password" autoComplete="current-password" />
                       </div>
-                      
                       <div className="">
                           <p>If you don't already have an account, please register <Link to="/register" >here</Link> </p>
                           <p>Click <Link to="/" >here</Link> to go back to  the home page</p>

@@ -1,5 +1,6 @@
 import {
     TOKEN,
+    TOKEN_FAILED,
     LOGOUT,
     REGISTER_FAILED,
     REGISTER_SUCCESSFUL,
@@ -20,35 +21,37 @@ const initialState = {
     isAdmin: false,
     registerSuccess: false,
     hasError: false,
-    activeCustomer: null
+    activeCustomer: null,
+    message: "Registration failed"
 };
 
 export default function CustomerReducer (state = initialState, action) {
     let newState = state;
     switch (action.type) {
         case TOKEN:
-            newState = Object.assign({}, state, {authenticated: true});
+            newState = Object.assign({}, state, {authenticated: true, hasError: false});
             return newState;
         case LOGOUT:
             localStorage.removeItem('customerId');
             localStorage.removeItem('token');
             return state;
         case REGISTER_SUCCESSFUL:
-            newState = Object.assign({}, state, {registerSuccess: true});
+            newState = Object.assign({}, state, {registerSuccess: true, hasError: false});
         case FETCH_CUSTOMER_DETAILS_RECEIVED:
-            newState = Object.assign({}, state, {activeCustomer: action.response.data});
+            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false});
             return newState;
         case FETCH_CUSTOMER_DETAILS_FAILED:
             newState = Object.assign({}, state, { hasError: true});
             return newState;
         case UPDATE_ADDRESS_RECEIVED:
-            newState = Object.assign({}, state, {activeCustomer: action.response.data});
+            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false});
             return newState;
 
         case UPDATE_REGION_ADDRESS_RECEIVED:
-            newState = Object.assign({}, state, {activeCustomer: action.response.data});
+            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false});
             return newState;
 
+        case TOKEN_FAILED:
         case UPDATE_REGION_ADDRESS_FAILED:
             newState = Object.assign({}, state, { hasError: true});
             return newState;

@@ -24,7 +24,10 @@ import {
     EMPTY_CARTS_FAILED,
     REMOVE_PRODUCT,
     REMOVE_PRODUCT_RECEIVED,
-    REMOVE_PRODUCT_FAILED
+    REMOVE_PRODUCT_FAILED,
+    UPDATE_QUANTITY_RECEIVED,
+    UPDATE_QUANTITY_FAILED,
+    UPDATE_QUANTITY
  } from '../actions/types';
 
 
@@ -61,27 +64,6 @@ function saveCartApi(payload) {
     let url;
     let newPayload;
     localStorage.setItem("cartId", payload.cartId);
-    // let cartsInfo = JSON.parse(localStorage.getItem('cartsInfo'));
-    // console.log('saga cartsInfo: ',cartsInfo)
-    // if (!_.isNil(cartsInfo)) {
-
-    //     _.forEach(cartsInfo, (cart) => {
-    //         if (cart.productId === payload.productId) {
-    //             url = api.api_path + api.version_path + api.shoppingCart_path + '/update/' + cart.itemId;
-    //             newPayload = {
-    //                 "quantity": cart.quantity + 1,
-    //             }
-    //         }
-    //     });
-    // } else {
-    //     url = api.api_path + api.version_path + api.shoppingCart_path + '/add';
-
-    //     newPayload = {
-    //         "cart_id": payload.cartId,
-    //         "product_id": payload.productId,
-    //         "attributes": payload.attributes,
-    //     }
-    // }
     url = api.api_path + api.version_path + api.shoppingCart_path + '/add';
 
     newPayload = {
@@ -134,7 +116,6 @@ function fetchCartCountApi(payload) {
 function* getCarts(action) {
     try {
         const response = yield call(fetchCartsApi, action);
-        console.log(response)
         yield put({ type: FETCH_ALL_CARTS_RECEIVED, response });
     }
     catch(error) {
@@ -144,7 +125,6 @@ function* getCarts(action) {
 
 function fetchCartsApi(payload) {
     let cartId = localStorage.getItem('cartId');
-    console.log(api.api_path + api.version_path + api.shoppingCart_path + '/' + cartId);
     return axios({
         method: "get",
         url: api.api_path + api.version_path + api.shoppingCart_path + '/' + cartId,
@@ -190,6 +170,28 @@ function removeProductApi(payload) {
     });
 }
 
+
+function* updateProductQuantity(action) {
+    try {
+        const response = yield call(updateProductQuantityApi, action);
+        yield put({ type: UPDATE_QUANTITY_RECEIVED, response });
+    }
+    catch(error) {
+        yield put({ type: UPDATE_QUANTITY_FAILED, error });
+    }
+}
+
+function updateProductQuantityApi(payload) {
+    const { itemId } = payload;
+    const url = api.api_path + api.version_path + api.shoppingCart_path + '/update/' + itemId;
+
+    const newPayload = {
+        "quantity": payload.quantityInput,
+    }
+
+    return axios.put(url, newPayload);
+}
+
 export function* getCartIdSaga() {
     yield takeLatest(FETCH_CART_ID, getCartId)
 }
@@ -216,4 +218,8 @@ export function* emptyCartsSaga() {
 
 export function* removeProductSaga() {
     yield takeLatest(REMOVE_PRODUCT, removeProduct)
+}
+
+export function* updateQuantitySaga() {
+    yield takeLatest(UPDATE_QUANTITY, updateProductQuantity)
 }

@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
-import { allCarts, emptyCart, totalPrice, removeProduct } from '../actions/ShoppingCart';
+import { allCarts, emptyCart, totalPrice, removeProduct, updateQuantity } from '../actions/ShoppingCart';
 import Navbar from './Navbar';
 
 class Basket extends Component {
@@ -14,8 +14,11 @@ class Basket extends Component {
             ...props,
             modalOpen: false,
             totalAmount: 0,
-            totalCartItem: 0
+            totalCartItem: 0,
+            quantityInput: 0,
+            itemId: ""
         };
+        this.handleQuantity = this.handleQuantity.bind(this);
     }
 
     componentDidMount () {
@@ -30,16 +33,47 @@ class Basket extends Component {
             }
         }
 
+        if (!_.isEqual(nextProps.ShoppingCartStore.totalAmount, this.props.ShoppingCartStore.totalAmount)) {
+            console.log(nextProps.ShoppingCartStore.totalAmount)
+            this.setState({
+                totalAmount: nextProps.ShoppingCartStore.totalAmount
+            });
+        }
+
         return true;
+    }
+
+    handleQuantity = (val, itemId, price) => {
+        this._input.focus();
+        const newValue = parseInt(this._input.value) + val
+        if (0 < newValue && newValue < 21 ) {
+            this._input.value = newValue
+            this.setState({
+                quantityInput: newValue,
+                totalAmount: price * newValue,
+                itemId: itemId
+            })
+        }
     }
 
     renderContent = () => {
         const {isBasketEmpty, allCarts, totalAmount} = this.props.ShoppingCartStore;
+        const totalPrice = (this.state.totalAmount == 0) ?  totalAmount : parseFloat(this.state.totalAmount).toFixed(2)
+        const self = this;
         return (
             <div>
                 {isBasketEmpty && <div> Your shopping cart is empty </div>}
                 <div className="table-responsive">
                     <table className="table-bordered table-striped table-condensed cf">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {allCarts.map((cart,index)=>(
                                 <tr key={index}
@@ -52,7 +86,33 @@ class Basket extends Component {
                                     </td>
                                     <td>{cart.name}</td>
                                     <td>${cart.price}</td>
-                                    <td>{cart.quantity}</td>
+                                    <td>
+                                        <div className="quantity">
+                                        <div class="input-group">
+                                          <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default btn-number"  data-type="minus" onClick={()=>this.handleQuantity(-1, cart.item_id, cart.price)} data-field="quant[1]">
+                                              <span class="glyphicon glyphicon-minus"></span>
+                                            </button>
+                                          </span>
+                                          <input type="number" 
+                                            class="form-control input-number"
+                                            readOnly 
+                                            defaultValue={cart.quantity}
+                                            ref={
+                                                function(el) {
+                                                    self._input = el;
+                                                }
+                                            }
+                                           />
+                                          <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default btn-number" data-type="plus" onClick={()=>this.handleQuantity(1, cart.item_id, cart.price)} data-field="quant[1]">
+                                              <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                          </span>
+                                          </div>
+                                        </div>
+                                    </td>
+
                                     <td>
                                         <span className="delete-cart"
                                         onClick={()=>this.removeProductFromBasket(cart.item_id)}></span>
@@ -67,7 +127,7 @@ class Basket extends Component {
                         <div className="row">
                             <div className="pull-right total-user-checkout">
                                 <b>Total:</b>
-                                ${totalAmount}
+                                ${totalPrice}
                             </div>
                         </div>
                     )
@@ -87,6 +147,8 @@ class Basket extends Component {
     }
 
     basketCheckout = () => {
+        const {itemId, quantityInput} = this.state
+        this.props.actions.updateQuantity(itemId, quantityInput)
         return (
                   browserHistory.push('/checkout')
               )
@@ -158,7 +220,8 @@ function mapDispatchToProps(dispatch) {
                 allCarts,
                 emptyCart,
                 removeProduct,
-                totalPrice
+                totalPrice,
+                updateQuantity
             },
             dispatch
         ),

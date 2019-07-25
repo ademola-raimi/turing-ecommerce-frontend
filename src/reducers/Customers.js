@@ -37,6 +37,7 @@ export default function CustomerReducer (state = initialState, action) {
             return state;
         case REGISTER_SUCCESSFUL:
             newState = Object.assign({}, state, {registerSuccess: true, hasError: false});
+            return newState;
         case FETCH_CUSTOMER_DETAILS_RECEIVED:
             newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false});
             return newState;

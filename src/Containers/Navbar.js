@@ -18,6 +18,7 @@ import { isLoggedIn } from '../helpers/helper';
 
 export default function Navbar() {
     const cartsInfo = JSON.parse(localStorage.getItem('cartsInfo'));
+    const customerName = localStorage.getItem('customerName')
     let cartCount = 0;
     if (cartsInfo && cartsInfo.length > 0) {
         cartCount = cartsInfo.length
@@ -49,6 +50,9 @@ export default function Navbar() {
                 }
                 {
                   !isLoggedIn() && (<li><a href="/login">Login</a></li>)
+                }
+                {
+                  isLoggedIn() && (<li onClick={()=>logout()} ><a href="#">Hello {customerName}</a></li>)
                 }
                 {
                   isLoggedIn() && (<li onClick={()=>logout()} ><a href="/login">Logout</a></li>)

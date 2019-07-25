@@ -3,6 +3,7 @@ import productReducer from '../reducers/Products';
 import {routerReducer} from 'react-router-redux';
 import Basket from '../reducers/Basket';
 import Categories from '../reducers/Categories';
+import Departments from '../reducers/Departments';
 import ShoppingCartReducer from '../reducers/ShoppingCart';
 import CustomerReducer from '../reducers/Customers';
 import OrderReducer from '../reducers/Order';
@@ -20,6 +21,7 @@ const store = createStore(
         Product: productReducer,
         Basket:Basket,
         Categories: Categories,
+        Departments: Departments,
         ShoppingCart: ShoppingCartReducer,
         Customer: CustomerReducer,
         Shipping: ShippingReducer,

@@ -13,7 +13,10 @@ import {
     SEARCH_PRODUCT_RECEIVED,
     FETCH_PRODUCTS_CATEGORY,
     FETCH_PRODUCTS_CATEGORY_FAILED,
-    FETCH_PRODUCTS_CATEGORY_RECEIVED
+    FETCH_PRODUCTS_CATEGORY_RECEIVED,
+    FETCH_PRODUCTS_DEPARTMENT,
+    FETCH_PRODUCTS_DEPARTMENT_FAILED,
+    FETCH_PRODUCTS_DEPARTMENT_RECEIVED
 } from '../actions/types';
 
 import _ from 'lodash';
@@ -36,6 +39,7 @@ const initialState = {
     activeCategoryId: null,
     searchValue: null,
     categoryPage: 1,
+    departmentPage: 1,
     searchPage: 1,
     page: 1
   }
@@ -82,16 +86,28 @@ export default function productReducer(state = initialState, action) {
             newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: allProducts, fetchProductsCategory: true, fetchProductssearch: false, activeCategoryId: action.categoryId});
             return newState;
 
+        case FETCH_PRODUCTS_DEPARTMENT_RECEIVED:
+            if (action.resetList) {
+                state.allProducts = [];
+            }
+            state.departmentPage += 1
+            // concatenate the array of videos returned to the existing list for infinite scroll
+            allProducts = _.concat(state.allProducts, action.response.data.data);
+            newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: allProducts, fetchProductsDepartment: true, fetchProductssearch: false, activeDepartmentId: action.departmentId});
+            return newState;
+
         case FETCH_ATTRIBUTES_RECEIVED:
             newState = Object.assign({}, state, { isLoading: false, atrributes: action.response.data });
             return newState;
 
+        case FETCH_PRODUCTS_DEPARTMENT:
         case FETCH_PRODUCTS_CATEGORY:
         case FETCH_ATTRIBUTES:
         case FETCH_PRODUCT:
         case FETCH_PRODUCTS:
             return state;
 
+        case FETCH_PRODUCTS_DEPARTMENT_FAILED:
         case FETCH_PRODUCTS_CATEGORY_FAILED:
         case SEARCH_PRODUCT_FAILED:
         case FETCH_ATTRIBUTES_FAILED:

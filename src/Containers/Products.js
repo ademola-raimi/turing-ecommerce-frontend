@@ -5,7 +5,7 @@ import {Link} from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
 import debounce from "lodash.debounce";
-import { fetchProducts, fetchAttributes, fetchProductsCategory, searchProducts } from '../actions/Products';
+import { fetchProducts, fetchAttributes, fetchProductsCategory, fetchProductsDepartment, searchProducts } from '../actions/Products';
 import { fetchCartId, totalPrice, totalCount } from '../actions/ShoppingCart';
 
 class Products extends Component {
@@ -25,13 +25,15 @@ class Products extends Component {
 
         // Binds our scroll event handler
         window.onscroll = debounce(() => {
-            const {error, isLoading, hasMore, fetchProductsCategory, fetchProductssearch, page, categoryPage, searchValue, searchPage, activeCategoryId} = this.props.ProductsStore;
+            const {error, isLoading, hasMore, fetchProductsCategory, fetchProductsDepartment, fetchProductssearch, page, categoryPage, departmentPage, searchValue, searchPage, activeCategoryId, activeDepartmentId} = this.props.ProductsStore;
             if (error || isLoading || !hasMore) return;
 
           // Checks that the page has scrolled to the bottom
             if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight) {
                 if (fetchProductsCategory) {
                     this.props.actions.fetchProductsCategory(false, activeCategoryId, categoryPage);
+                } else if (fetchProductsDepartment) {
+                    this.props.actions.fetchProductsDepartment(false, activeDepartmentId, departmentPage);
                 } else if (fetchProductssearch) {
                     this.props.actions.searchProducts(false, searchValue, searchPage);
                 } else {
@@ -49,15 +51,12 @@ class Products extends Component {
 
     shouldComponentUpdate (nextProps, nextState, nextContent) {
         if (!_.isEqual(nextProps.ProductsStore.allProducts, this.props.ProductsStore.allProducts)) {
-            if (nextProps.ProductsStore.allProducts.length > 0){
-                this.setState({
-                    products: nextProps.ProductsStore.allProducts,
-                })
-            }
+            this.setState({
+                products: nextProps.ProductsStore.allProducts,
+            })
         }
 
         if (!_.isEqual(nextProps.ProductsStore.hasMore, this.props.ProductsStore.hasMore)) {
-            console.log('has more compo...',nextProps.ProductsStore.hasMore)
             this.setState({
                     products: nextProps.ProductsStore.allProducts,
                 })
@@ -100,9 +99,9 @@ class Products extends Component {
         <div>
             <div className="books row">
                 {
-                    this.state.products.map((product,index)=>{
+                    this.state.products.length > 0 ? this.state.products.map((product,index)=>{
                         return this.renderProducts(product,index);
-                    })
+                    }) : "No product to display"
                 }
             </div>
             <div className="row">
@@ -132,6 +131,7 @@ function mapDispatchToProps(dispatch) {
                 totalPrice,
                 totalCount,
                 fetchProductsCategory,
+                fetchProductsDepartment,
                 searchProducts
             },
             dispatch

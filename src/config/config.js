@@ -5,6 +5,7 @@ module.exports = {
     products_path: '/products',
     cloudinary_path: 'https://res.cloudinary.com/demola/image/upload/v1563150887/turing/',
     categories_path: '/categories',
+    departments_path: '/departments',
     attributes_path: '/attributes',
     shoppingCart_path: '/shoppingcart',
     customers_path: '/customers',

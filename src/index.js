@@ -15,7 +15,6 @@ const jsx = (
             <Route component={Layout}>
                 <Route exact path="/" component={Products}/>
                 <Route path='/products' component={Products}></Route>
-                <Route path='/categories/:id' component={Products} />
             </Route>
             <Route exact path='/product/:id' component={ProductDetails}></Route>
             <Route path="/basket" component={Basket} />

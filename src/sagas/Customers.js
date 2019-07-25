@@ -41,6 +41,7 @@ function* getAndSetToken(action) {
         let customerId = decoded.customer_id;
         localStorage.setItem("customerId", customerId);
         localStorage.setItem("token", token);
+        localStorage.setItem("customerName", response.data.customer.name);
         yield put({ type: SET_CUSTOMER_ID, customerId });
         yield put({ type: TOKEN, response });
     }

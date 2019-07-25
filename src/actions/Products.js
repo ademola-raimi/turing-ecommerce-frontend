@@ -3,7 +3,8 @@ import {
     FETCH_PRODUCT,
     FETCH_ATTRIBUTES,
     SEARCH_PRODUCT,
-    FETCH_PRODUCTS_CATEGORY
+    FETCH_PRODUCTS_CATEGORY,
+    FETCH_PRODUCTS_DEPARTMENT
 } from '../actions/types';
 
 export const fetchProducts = (resetList, page) => ({
@@ -36,3 +37,9 @@ export const fetchProductsCategory = (resetList, categoryId, page) => ({
     page
 })
 
+export const fetchProductsDepartment = (resetList, departmentId, page) => ({
+    type: FETCH_PRODUCTS_DEPARTMENT,
+    resetList,
+    departmentId,
+    page
+})

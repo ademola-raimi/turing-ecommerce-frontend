@@ -57,7 +57,6 @@ class Register extends Component {
 
     handleValidation() {
         let fields = this.state;
-        // let room = this.state.room_id;
         let errors = {};
         let formIsValid = true;
 
@@ -91,7 +90,8 @@ class Register extends Component {
     }
 
   renderRedirect() {
-      const { registerSuccess, hasError, message } = this.props.CustomerStore  
+      const { registerSuccess, hasError, message } = this.props.CustomerStore
+
       if (registerSuccess) {
             return (
                 browserHistory.push('/login')

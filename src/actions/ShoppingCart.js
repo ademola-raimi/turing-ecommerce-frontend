@@ -6,7 +6,8 @@ import {
     FETCH_CART_COUNT,
     FETCH_ALL_CARTS,
     EMPTY_CARTS,
-    REMOVE_PRODUCT
+    REMOVE_PRODUCT,
+    UPDATE_QUANTITY
 } from '../actions/types';
 
 export const fetchCartId = () => ({
@@ -25,6 +26,12 @@ export const updateCart = (productId, cartId, attributes) => ({
     productId,
     cartId,
     attributes
+});
+
+export const updateQuantity = (itemId, quantityInput) => ({
+    type: UPDATE_QUANTITY,
+    itemId,
+    quantityInput
 });
 
 export const totalPrice = () => ({

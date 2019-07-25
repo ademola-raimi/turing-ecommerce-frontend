@@ -7,6 +7,8 @@ import api from '../config/config.js';
 import { fetchToken } from '../actions/Customers';
 import ReactSnackBar from "react-js-snackbar";
 import NotificationSnackbar from "./NotificationSnackbar";
+import SweetAlert from 'sweetalert-react';
+import 'sweetalert/dist/sweetalert.css';
 
 class Login extends Component {
     constructor (props) {
@@ -15,11 +17,22 @@ class Login extends Component {
             ...props,
             email: '',
             password: '',
+            show: false
         };
 
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentDidMount() {
+      const {registerSuccess} = this.props.CustomerStore
+
+      if (registerSuccess) {
+        this.setState({
+          show: registerSuccess
+        })
+      }
     }
 
     handleEmailChange(event) {
@@ -56,6 +69,19 @@ class Login extends Component {
         }
     }
 
+    renderSweetAlert() {
+      return (
+        <div>
+          <SweetAlert
+            show={this.state.show}
+            title="Success"
+            text="Registration was Successfull, Please login."
+            onConfirm={() => this.setState({ show: false })}
+          />
+        </div>
+      )
+    }
+
     render() {
         return (
             <div className="view-container">
@@ -77,6 +103,7 @@ class Login extends Component {
                       <button type="submit" className="btn btn-default">Sign in</button>
                     </form>
                     { this.renderRedirect() }
+                    { this.renderSweetAlert() }
                 </div>
             </div>
         );

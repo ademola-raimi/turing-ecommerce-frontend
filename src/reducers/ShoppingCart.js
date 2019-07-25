@@ -19,7 +19,10 @@ import {
     EMPTY_CARTS_FAILED,
     REMOVE_PRODUCT,
     REMOVE_PRODUCT_RECEIVED,
-    REMOVE_PRODUCT_FAILED
+    REMOVE_PRODUCT_FAILED,
+    UPDATE_QUANTITY_RECEIVED,
+    UPDATE_QUANTITY_FAILED,
+    UPDATE_QUANTITY
 } from '../actions/types';
 
 import _ from 'lodash';
@@ -59,15 +62,17 @@ export default function categoryReducer(state = initialState, action) {
             return newState;
 
         case FETCH_ALL_CARTS_RECEIVED:
-            console.log('all carts: ',action.response.data)
             localStorage.setItem("cartsInfo", JSON.stringify(action.response.data));
             const isBasketEmpty = action.response.data.length > 0 ? false : true;
             newState = Object.assign({}, state, { isLoading: false, allCarts: action.response.data, isBasketEmpty: isBasketEmpty, removeProduct: false});
             return newState;
 
         case EMPTY_CARTS_RECEIVED:
-            console.log('empty cart received: ',action.response.data)
             newState = Object.assign({}, state, { isLoading: false, allCarts: [], isBasketEmpty: true, totalCartItem: 0, totalAmount: 0});
+            return newState;
+
+        case UPDATE_QUANTITY_RECEIVED:
+            newState = Object.assign({}, state, { isLoading: false, allCarts: action.response.data });
             return newState;
 
         case REMOVE_PRODUCT_RECEIVED:
@@ -78,6 +83,7 @@ export default function categoryReducer(state = initialState, action) {
             newState = Object.assign({}, state, { isLoading: false, isBasketEmpty: true});
             return newState;
 
+        case UPDATE_QUANTITY:
         case REMOVE_PRODUCT:
         case EMPTY_CARTS:
         case FETCH_ALL_CARTS:
@@ -87,6 +93,7 @@ export default function categoryReducer(state = initialState, action) {
         case FETCH_CART_ID:
             return state;
 
+        case UPDATE_QUANTITY_FAILED:
         case REMOVE_PRODUCT_FAILED:
         case EMPTY_CARTS_FAILED:
         case FETCH_ALL_CARTS_FAILED:

@@ -111,9 +111,7 @@ function* getOrder(action) {
 }
 
 function fetchOrderApi(payload) {
-    console.log('saga',payload)
     const { orderId } = payload
-    console.log(orderId)
 
     return axios({
         method: "get",

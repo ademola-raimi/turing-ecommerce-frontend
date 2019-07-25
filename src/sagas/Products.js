@@ -18,7 +18,10 @@ import {
     SEARCH_PRODUCT_RECEIVED,
     FETCH_PRODUCTS_CATEGORY,
     FETCH_PRODUCTS_CATEGORY_FAILED,
-    FETCH_PRODUCTS_CATEGORY_RECEIVED
+    FETCH_PRODUCTS_CATEGORY_RECEIVED,
+    FETCH_PRODUCTS_DEPARTMENT,
+    FETCH_PRODUCTS_DEPARTMENT_FAILED,
+    FETCH_PRODUCTS_DEPARTMENT_RECEIVED
  } from '../actions/types';
 
 function* getProducts(action) {
@@ -152,6 +155,38 @@ function fetchProductsCategoryApi(payload) {
     });
 }
 
+function* fetchProductsDepartment(action) {
+    try {
+        const response = yield call(fetchProductsDepartmentApi, action);
+        yield put({ type: FETCH_PRODUCTS_DEPARTMENT_RECEIVED, response, resetList: action.resetList, departmentId: action.departmentId });
+    }
+    catch(error) {
+        yield put({ type: FETCH_PRODUCTS_DEPARTMENT_FAILED, error });
+    }
+}
+
+function fetchProductsDepartmentApi(payload) {
+    const { departmentId } = payload
+    // build the params based on available content in payload
+    // this will work for searching and displaying the full list of videos
+    let params = {};
+    let url;
+    if (payload.page) params.page = payload.page;
+    if (payload.departmentId != null) {
+        url =api.api_path + api.version_path + api.products_path + '/inDepartment/' + departmentId;
+    } else {
+        url = api.api_path + api.version_path + api.products_path
+    }
+    params.description_length = 50;
+    params.limit = 10;
+    return axios({
+        method: "get",
+        url: url,
+        params: params,
+        crossdomain: true
+    });
+}
+
 export function* getProductsSaga() {
     yield takeLatest(FETCH_PRODUCTS, getProducts)
 }
@@ -171,3 +206,7 @@ export function* searchProductSaga() {
 export function* fetchProductsCategorySaga() {
     yield takeLatest(FETCH_PRODUCTS_CATEGORY, fetchProductsCategory)
 }
+export function* fetchProductsDepartmentSaga() {
+    yield takeLatest(FETCH_PRODUCTS_DEPARTMENT, fetchProductsDepartment)
+}
+

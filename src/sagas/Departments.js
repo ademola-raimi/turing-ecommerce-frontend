@@ -24,7 +24,6 @@ function fetchDepartmentsApi(payload) {
     return axios({
         method: "get",
         url: api.api_path + api.version_path + api.departments_path,
-        // params: params,
         crossdomain: true
     });
 }

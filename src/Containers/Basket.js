@@ -44,17 +44,16 @@ class Basket extends Component {
     }
 
     handleQuantity = (val, itemId, price, index) => {
+        const totalAmount = parseFloat(this.props.ShoppingCartStore.totalAmount);
         const newValue = parseInt(this._input[index].value) + val
-        this.props.actions.updateQuantity(itemId, newValue)
-        this.setState({quantityStatus: "updating"})
-        const { quantitySucess } = this.props.ShoppingCartStore;
-        let totalAmount = parseFloat(this.state.totalAmount);
+        const initialPrice = (this.state.totalAmount == 0) ?  totalAmount : parseFloat(this.state.totalAmount);
         price = parseFloat(price);
-        let newTotalAmount = (val == -1) ? totalAmount - price : totalAmount + price;
+        let newTotalAmount = (val == -1) ? parseFloat(initialPrice) - price : parseFloat(initialPrice) + price;
         if (0 < newValue && newValue < 21 ) {
+            this.props.actions.updateQuantity(itemId, newValue)
             this._input[index].value = newValue
             this.setState({
-                totalAmount: newTotalAmount,
+                totalAmount: newTotalAmount
             })
         }
     }

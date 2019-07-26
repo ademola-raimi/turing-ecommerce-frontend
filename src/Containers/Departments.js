@@ -54,7 +54,6 @@ import _ from 'lodash';
 
     render() {
         const { allDepartments } = this.props.DepartmentStore;
-        console.log('container; ',allDepartments)
         return (
             <div className="well">
                 <h4>Departments</h4>
@@ -68,7 +67,6 @@ import _ from 'lodash';
                     </Link>
                     {
                         allDepartments.map((department,index)=>{
-                            console.log('department: ',department)
                         return this.renderDepartment(department,index);
                     })
                 }

@@ -27,7 +27,6 @@ export default function departmentReducer(state = initialState, action) {
     let newState = state;
     switch (action.type) {
         case FETCH_DEPARTMENTS_RECEIVED:
-            // const totalDepartments = action.response.data.total;
             // reset if there is a new search or we need to see the full list again
             if(action.resetList){
                 state.allDepartments = [];

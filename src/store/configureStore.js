@@ -1,7 +1,6 @@
 import {createStore, combineReducers,applyMiddleware,compose} from 'redux';
 import productReducer from '../reducers/Products';
 import {routerReducer} from 'react-router-redux';
-import Basket from '../reducers/Basket';
 import Categories from '../reducers/Categories';
 import Departments from '../reducers/Departments';
 import ShoppingCartReducer from '../reducers/ShoppingCart';
@@ -19,7 +18,6 @@ const store = createStore(
     combineReducers({
         routing:routerReducer,
         Product: productReducer,
-        Basket:Basket,
         Categories: Categories,
         Departments: Departments,
         ShoppingCart: ShoppingCartReducer,

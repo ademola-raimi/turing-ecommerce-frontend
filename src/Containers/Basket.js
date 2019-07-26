@@ -16,8 +16,9 @@ class Basket extends Component {
             totalAmount: 0,
             totalCartItem: 0,
             quantityInput: 0,
-            itemId: ""
+            itemId: "",
         };
+        this.textInput = React.createRef();
         this.handleQuantity = this.handleQuantity.bind(this);
     }
 
@@ -34,7 +35,6 @@ class Basket extends Component {
         }
 
         if (!_.isEqual(nextProps.ShoppingCartStore.totalAmount, this.props.ShoppingCartStore.totalAmount)) {
-            console.log(nextProps.ShoppingCartStore.totalAmount)
             this.setState({
                 totalAmount: nextProps.ShoppingCartStore.totalAmount
             });
@@ -43,23 +43,27 @@ class Basket extends Component {
         return true;
     }
 
-    handleQuantity = (val, itemId, price) => {
-        this._input.focus();
-        const newValue = parseInt(this._input.value) + val
+    handleQuantity = (val, itemId, price, index) => {
+        const newValue = parseInt(this._input[index].value) + val
+        this.props.actions.updateQuantity(itemId, newValue)
+        this.setState({quantityStatus: "updating"})
+        const { quantitySucess } = this.props.ShoppingCartStore;
+        let totalAmount = parseFloat(this.state.totalAmount);
+        price = parseFloat(price);
+        let newTotalAmount = (val == -1) ? totalAmount - price : totalAmount + price;
         if (0 < newValue && newValue < 21 ) {
-            this._input.value = newValue
+            this._input[index].value = newValue
             this.setState({
-                quantityInput: newValue,
-                totalAmount: price * newValue,
-                itemId: itemId
+                totalAmount: newTotalAmount,
             })
         }
     }
 
     renderContent = () => {
-        const {isBasketEmpty, allCarts, totalAmount} = this.props.ShoppingCartStore;
-        const totalPrice = (this.state.totalAmount == 0) ?  totalAmount : parseFloat(this.state.totalAmount).toFixed(2)
+        const {isBasketEmpty, allCarts, totalAmount, quantitySucess} = this.props.ShoppingCartStore;
+        const totalPrice = (this.state.totalAmount == 0) ?  totalAmount : parseFloat(this.state.totalAmount).toFixed(2);
         const self = this;
+        self._input = []
         return (
             <div>
                 {isBasketEmpty && <div> Your shopping cart is empty </div>}
@@ -88,25 +92,26 @@ class Basket extends Component {
                                     <td>${cart.price}</td>
                                     <td>
                                         <div className="quantity">
-                                        <div class="input-group">
-                                          <span class="input-group-btn">
-                                            <button type="button" class="btn btn-default btn-number"  data-type="minus" onClick={()=>this.handleQuantity(-1, cart.item_id, cart.price)} data-field="quant[1]">
-                                              <span class="glyphicon glyphicon-minus"></span>
+                                        <div className="input-group">
+                                          <span className="input-group-btn">
+                                            <button type="button" class="btn btn-default btn-number"  data-type="minus" onClick={()=>this.handleQuantity(-1, cart.item_id, cart.price, index)} data-field="quant[1]">
+                                              <span className="glyphicon glyphicon-minus"></span>
                                             </button>
                                           </span>
-                                          <input type="number" 
-                                            class="form-control input-number"
+                                          <input
+                                            type="number" 
+                                            className="form-control input-number"
                                             readOnly 
                                             defaultValue={cart.quantity}
                                             ref={
                                                 function(el) {
-                                                    self._input = el;
+                                                    self._input[index] = el;
                                                 }
                                             }
                                            />
-                                          <span class="input-group-btn">
-                                            <button type="button" class="btn btn-default btn-number" data-type="plus" onClick={()=>this.handleQuantity(1, cart.item_id, cart.price)} data-field="quant[1]">
-                                              <span class="glyphicon glyphicon-plus"></span>
+                                          <span className="input-group-btn">
+                                            <button type="button" className="btn btn-default btn-number" data-type="plus" onClick={()=>this.handleQuantity(1, cart.item_id, cart.price, index)} data-field="quant[1]">
+                                              <span className="glyphicon glyphicon-plus"></span>
                                             </button>
                                           </span>
                                           </div>
@@ -147,8 +152,6 @@ class Basket extends Component {
     }
 
     basketCheckout = () => {
-        const {itemId, quantityInput} = this.state
-        this.props.actions.updateQuantity(itemId, quantityInput)
         return (
                   browserHistory.push('/checkout')
               )

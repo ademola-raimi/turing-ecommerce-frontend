@@ -72,7 +72,7 @@ export default function categoryReducer(state = initialState, action) {
             return newState;
 
         case UPDATE_QUANTITY_RECEIVED:
-            newState = Object.assign({}, state, { isLoading: false, allCarts: action.response.data });
+            newState = Object.assign({}, state, { isLoading: false });
             return newState;
 
         case REMOVE_PRODUCT_RECEIVED:

@@ -1,66 +1,63 @@
 import React from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
-import Badge from '@material-ui/core/Badge';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import MailIcon from '@material-ui/icons/Mail';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
 import { isLoggedIn } from '../helpers/helper';
+import {Link} from 'react-router';
+import { fetchProductsCategory } from '../actions/Products';
+import {connect} from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-export default function Navbar() {
-    const cartsInfo = JSON.parse(localStorage.getItem('cartsInfo'));
+ function Navbar(props) {
+    const cartCount = props.ShoppingCartStore.totalCartItem;
+    const allCategories = props.CategoryStore.allCategories;
     const customerName = localStorage.getItem('customerName')
-    let cartCount = 0;
-    if (cartsInfo && cartsInfo.length > 0) {
-        cartCount = cartsInfo.length
-    }
     return (
-        <nav className="navbar navbar-default">
-          <div className="container-fluid">
-            <div className="navbar-header">
-              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span className="sr-only">Toggle navigation</span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-              </button>
-              <a className="navbar-brand" href="/">Home</a>
-            </div>
-
-            <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-              <ul className="nav navbar-nav">
-                <li className=""><a href="/basket">BasketCart <span className="badge">{cartCount}</span></a></li>
-              </ul>
-              <ul className="nav navbar-nav">
-                <li className=""><a href="/orders">Orders</a></li>
-              </ul>
-
-              <ul className="nav navbar-nav navbar-right">
+        <header className="bg-dark">
+          <div className="top">
+            <div className="topbar">
+              <span className="hello">
                 {
-                  !isLoggedIn() && (<li><a href="/register">Register</a></li>)
+                  isLoggedIn() && (<li> <Link>Welcome {customerName}</Link> </li>)
                 }
-                {
-                  !isLoggedIn() && (<li><a href="/login">Login</a></li>)
-                }
-                {
-                  isLoggedIn() && (<li onClick={()=>logout()} ><a href="#">Hello {customerName}</a></li>)
-                }
-                {
-                  isLoggedIn() && (<li onClick={()=>logout()} ><a href="/login">Logout</a></li>)
-                }
-              </ul>
+              </span>
+              <span className="hello-right">
+                <ul className="top-right">
+                <li className=""><Link to={`/basket`}>Cart <span>({cartCount})</span> </Link> </li>
+                <li className=""><Link to={`/orders`}>Orders</Link></li>
+                  {
+                    isLoggedIn() && (<li onClick={()=>logout()} ><a href={`/login`}>Logout</a></li>)
+                  }
+                  {
+                    !isLoggedIn() && (<li><Link to={`/login`}>Login</Link></li>)
+                  }
+                  {
+                    !isLoggedIn() && (<li><Link to={`/register`}>register</Link></li>)
+                  }
+                </ul>
+              </span>
             </div>
           </div>
-        </nav>
+          <div className="container">
+            <nav className="navbar navbar-defa.ult">
+                <div className="navbar-header">
+                  <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                  </button>
+                  <Link className="navbar-brand" to={`/`}>Home</Link>
+                </div>
+
+                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul className="nav navbar-nav navbar-right">
+                  <li onClick={()=>fetchProductCategory(props, null)} className="categoryNav"><Link to="#">All</Link></li>
+                  {allCategories.map((category)=>{
+                          return <li onClick={()=>fetchProductCategory(props, category.category_id)} className="categoryNav"><Link to="#">{category.name}</Link></li>
+                        })}
+                  </ul>
+                </div>
+            </nav>
+          </div>
+        </header>
 
     );
 }
@@ -70,3 +67,27 @@ const logout = () => {
   localStorage.removeItem('customerId');
 
 }
+
+const fetchProductCategory = (props, categoryId) => {
+        props.actions.fetchProductsCategory(true, categoryId);
+}
+
+function mapStateToProps(state) {
+    return {
+        ShoppingCartStore: state.ShoppingCart,
+        CategoryStore: state.Categories
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(
+            {
+              fetchProductsCategory
+            },
+            dispatch
+        ),
+    };
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Navbar);

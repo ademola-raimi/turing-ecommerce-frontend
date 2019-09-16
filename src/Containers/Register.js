@@ -3,10 +3,9 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
-import api from '../config/config.js';
 import { registerCustomer } from '../actions/Customers'
 import { validateEmail } from '../helpers/helper';
-import NotificationSnackbar from "./NotificationSnackbar";
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class Register extends Component {
     constructor (props) {
@@ -25,6 +24,14 @@ class Register extends Component {
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    shouldComponentUpdate (nextProps, nextState, nextContent) {
+        if (!_.isEqual(nextProps.CustomerStore.registerSuccess, this.props.CustomerStore.registerSuccess)) {
+            NotificationManager.error('Registeration failed, please try again', 'Auth');
+        }
+
+        return true;
     }
 
     handleNameChange(event) {
@@ -89,29 +96,21 @@ class Register extends Component {
         return formIsValid;
     }
 
-  renderRedirect() {
-      const { registerSuccess, hasError, message } = this.props.CustomerStore
-
-      if (registerSuccess) {
+    renderRedirect() {
+        const { registerSuccess } = this.props.CustomerStore
+        if (registerSuccess) {
             return (
                 browserHistory.push('/login')
             )
-       } else if (hasError) {
-            return (
-              <NotificationSnackbar
-                message={message}
-              />
-            )
-        } else {
-          return null
         }
-  }
+    }
 
     render() {
         return (
             <div className="view-container">
                 <div className="container">
                     <h2>Register</h2>
+                    <NotificationContainer/>
                     <form onSubmit={this.handleSubmit}>
                         <div className="form-group">
                             <label htmlFor="name">Name</label>

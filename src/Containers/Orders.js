@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link, browserHistory } from 'react-router';
-import _ from 'lodash';
-import api from '../config/config.js';
 import { fetchOrders } from '../actions/Order';
 import Navbar from './Navbar';
 import { isLoggedIn } from '../helpers/helper';
@@ -36,17 +34,16 @@ class Orders extends Component {
 
     renderOrders = (order,index)=>{
         return (
-            <div className='col-md-9' key={index}>
+            <div className='col-md-12' key={index}>
                 
-                    <div class="panel panel-default">
+                    <div className="panel panel-default">
                         <Link to={`/order/${order.order_id}`}>
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Order Id: {order.order_id}</h3>
-                        </div>
-                        
-                        <div class="panel-body">
-                        Order amount: {order.total_amount}
-                        </div>
+                            <div className="panel-heading">
+                                <h3 className="panel-title">Order Id: {order.order_id}</h3>
+                            </div>
+                            <div className="panel-body">
+                            Order amount: {order.total_amount}
+                            </div>
                         </Link>
                     </div>
                 
@@ -60,9 +57,13 @@ class Orders extends Component {
         return(
             <div className="view-container">
                 <div className="container">
-                    <Navbar/>
-                    <h2>Your Orders</h2>
                     <div className="row">
+                        <Navbar/>
+                    </div>
+                    <div className="row">
+                        <div className='col-md-12'>
+                            <h2 className="text-center-sm">Your Order</h2>
+                        </div>
                         {
                             orders.map((order,index)=>{
                                 return this.renderOrders(order,index);

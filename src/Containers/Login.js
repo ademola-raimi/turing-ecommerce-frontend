@@ -3,12 +3,8 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link, browserHistory } from 'react-router';
 import _ from 'lodash';
-import api from '../config/config.js';
 import { fetchToken } from '../actions/Customers';
-import ReactSnackBar from "react-js-snackbar";
-import NotificationSnackbar from "./NotificationSnackbar";
-import SweetAlert from 'sweetalert-react';
-import 'sweetalert/dist/sweetalert.css';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class Login extends Component {
     constructor (props) {
@@ -25,14 +21,24 @@ class Login extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentDidMount() {
-      const {registerSuccess} = this.props.CustomerStore
+    shouldComponentUpdate (nextProps, nextState, nextContent) {
+        if (!_.isEqual(nextProps.CustomerStore.hasError, this.props.CustomerStore.hasError)) {
+            NotificationManager.error('Authentication failed', 'Auth');
+        }
 
-      if (registerSuccess) {
-        this.setState({
-          show: registerSuccess
-        })
-      }
+        if (!_.isEqual(nextProps.CustomerStore.registerSuccess, this.props.CustomerStore.registerSuccess)) {
+            if (nextProps.CustomerStore.registerSuccess) {
+              NotificationManager.success('Registration successfull, please login to proceed', 'Auth');
+            }
+        }
+
+        if (!_.isEqual(nextProps.CustomerStore.authenticated, this.props.CustomerStore.authenticated)) {
+            if (nextProps.CustomerStore.authenticated) {
+              NotificationManager.success('Authenticated, redirecting...', 'Auth');
+            }
+        }
+
+        return true;
     }
 
     handleEmailChange(event) {
@@ -53,33 +59,12 @@ class Login extends Component {
     }
 
     renderRedirect() {
-        const { authenticated, hasError } = this.props.CustomerStore  
+        const { authenticated } = this.props.CustomerStore
         if (authenticated) {
               return (
                   browserHistory.push('/')
               )
-         } else if (hasError) {
-            return (
-              <NotificationSnackbar
-                message="Authentication Failed"
-              />
-            )
-        } else {
-          return null
         }
-    }
-
-    renderSweetAlert() {
-      return (
-        <div>
-          <SweetAlert
-            show={this.state.show}
-            title="Success"
-            text="Registration was Successfull, Please login."
-            onConfirm={() => this.setState({ show: false })}
-          />
-        </div>
-      )
     }
 
     render() {
@@ -87,6 +72,7 @@ class Login extends Component {
             <div className="view-container">
                 <div className="container">
                     <h2>Login</h2>
+                    <NotificationContainer/>
                     <form onSubmit={this.handleSubmit}>
                       <div className="form-group">
                           <label htmlFor="Email">Email address</label>
@@ -103,7 +89,6 @@ class Login extends Component {
                       <button type="submit" className="btn btn-default">Sign in</button>
                     </form>
                     { this.renderRedirect() }
-                    { this.renderSweetAlert() }
                 </div>
             </div>
         );

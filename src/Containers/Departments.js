@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {Link,withRouter} from 'react-router';
-import {compose} from 'redux';
-import classNames from 'classnames';
+import {Link} from 'react-router';
 import { fetchDepartments } from '../actions/Departments';
 import { fetchProductsDepartment } from '../actions/Products';
 import { bindActionCreators } from 'redux';
+import Loader from 'react-loader-spinner';
 import _ from 'lodash';
 
 
@@ -40,7 +39,7 @@ import _ from 'lodash';
     }
 
     renderDepartment = (department,index)=>{
-        const linkClass = (this.state.activeDepartmentId == department.department_id) ? "list-group-item active" : "list-group-item"
+        const linkClass = (this.state.activeDepartmentId === department.department_id) ? "list-group-item active" : "list-group-item"
         return(
             <Link
                 to='#'
@@ -53,10 +52,11 @@ import _ from 'lodash';
     };
 
     render() {
-        const { allDepartments } = this.props.DepartmentStore;
+        const { allDepartments, isLoading } = this.props.DepartmentStore;
         return (
             <div className="well">
                 <h4>Departments</h4>
+                {isLoading ? <Loader type="ThreeDots" className="loader" /> :
                 <div className="list-group">
                     <Link
                         to='#'
@@ -70,7 +70,7 @@ import _ from 'lodash';
                         return this.renderDepartment(department,index);
                     })
                 }
-                </div>
+                </div>}
             </div>
     )};
 };

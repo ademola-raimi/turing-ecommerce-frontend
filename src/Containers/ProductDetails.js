@@ -3,12 +3,15 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
 import BasketCart  from './BasketCart';
+import Loader from 'react-loader-spinner';
 import {Link} from 'react-router';
 import { fetchProduct, fetchAttributes } from '../actions/Products';
 import { fetchCartId, saveCart, totalPrice, totalCount } from '../actions/ShoppingCart';
 import api from '../config/config.js';
 import { formatAttributes } from '../helpers/helper';
 import Navbar from './Navbar';
+import 'react-notifications/lib/notifications.css';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class ProductDetails extends Component {
     constructor (props) {
@@ -23,7 +26,9 @@ class ProductDetails extends Component {
             selectedSize: '',
             totalAmount: 0,
             totalCartItem: 0,
-            errors: {}
+            errors: {},
+            loading: false,
+            disabled: ""
         };
     }
 
@@ -57,14 +62,23 @@ class ProductDetails extends Component {
         if (!_.isEqual(nextProps.ShoppingCartStore.totalAmount, this.props.ShoppingCartStore.totalAmount)) {
             this.setState({
                 totalAmount: nextProps.ShoppingCartStore.totalAmount,
+                loading: false,
+                disabled: ""
             })
         }
 
         if (!_.isEqual(nextProps.ShoppingCartStore.totalCartItem, this.props.ShoppingCartStore.totalCartItem)) {
             this.props.actions.totalPrice();
+            NotificationManager.success('Successfully added to cart', 'shopping cart');
             this.setState({
                 totalCartItem: nextProps.ShoppingCartStore.totalCartItem,
+                loading: false,
+                disabled: ""
             })
+        }
+
+        if (!_.isEqual(nextProps.ShoppingCartStore.hasError, this.props.ShoppingCartStore.hasError)) {
+            NotificationManager.error('Something went wrong', 'shopping cart');
         }
 
         return true;
@@ -74,23 +88,23 @@ class ProductDetails extends Component {
         const {product} = this.props.ProductsStore;
         return(
             <div>
-                <div className='thumbnail'>
-                    <div className="col-md-6">
-                        <img className='img-thumbnail'
+                <div className='move-left'>
+                    <div className="col-md-4">
+                        <img
                             src={api.cloudinary_path + product.image}
                             alt={product.name}
                         />
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-8">
+                        <div className='caption-full'>
+                            <h4>
+                                {product.name}
+                            </h4>
+                            <p>
+                                {product.description}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div className='caption-full'>
-                    <h4>
-                        {product.name}
-                    </h4>
-                    <p>
-                        {product.description}
-                    </p>
                 </div>
             </div>
         );
@@ -102,22 +116,21 @@ class ProductDetails extends Component {
         })
     };
 
-    handleSizeChange = (event) => {
+    handleSizeChange = (size) => {
         this.setState({
-            selectedSize: event.target.value
+            selectedSize: size
         })
     }
 
     handleValidation = () => {
-        let {selectedColor, selectedSize} = this.state;
+        let { selectedSize } = this.state;
         let errors = {};
-        let attr = "Not specify";
         let formIsValid = true;
-        if (!selectedSize || selectedSize == "Select size") {
+        if (!selectedSize || selectedSize === "Select size") {
             formIsValid = false;
             errors["size"] = 'Size is required.';
         }
-         if (!selectedSize || selectedSize == "Select color") {
+         if (!selectedSize || selectedSize === "Select color") {
             formIsValid = false;
             errors["color"] = 'Color is required.';
         }
@@ -135,9 +148,10 @@ class ProductDetails extends Component {
 
     addProductToCart = (productId) => {
         if (this.handleValidation()) {
+            this.setState({ loading: true, disabled: "disabled" });
             const {cartId, selectedSize, selectedColor} = this.state;
             let attributes = selectedSize + " " + selectedColor;
-            if (attributes == " ") {
+            if (attributes === " ") {
                 attributes = "Not specify";
             }
 
@@ -145,35 +159,46 @@ class ProductDetails extends Component {
         }
     }
 
+    renderSizeAttributes = (size)=>{
+        const linkClass = (this.state.selectedSize === size) ? "badge badge-red active" : "badge"
+        return(
+            <Link
+                className={linkClass}
+                onClick={()=>this.handleSizeChange(size)}
+            >
+                {size}
+            </Link>
+        );
+    };
+
     renderSideBar = ()=>{
         const {product} = this.props.ProductsStore;
         return(
             <div>
                <div>
-                    <p className='lead'> Quick Shop</p>
-                    <div className="cart">
+                   <div className="cart">
                         <div className="dropdown">
                             <BasketCart/>
                         </div>
                     </div>
-                    <div className='form-group'>
+                    <div className='form-group product-sidebar'>
                         <h1>{product.name}</h1>
                         <h2 >
-                            ${product.discounted_price == '0.00' ? product.price : product.discounted_price}
+                            ${product.discounted_price === '0.00' ? product.price : product.discounted_price}
                         </h2>
                         <h2>
                             <strike>
-                                {product.discounted_price != '0.00' ? '$'+product.price : ''}
+                                {product.discounted_price !== '0.00' ? '$'+product.price : ''}
                             </strike>
-                       </h2>
-                       <div className='form-group'>
-                       <select onChange={this.handleSizeChange}  className="form-inline">
-                           <option value="">Select size</option>
-                           {this.state.sizes.map((size) => {
-                                return <option name={size} value={size}>{size}</option>;
-                           })}
-                       </select>
-                       </div>
+                        </h2>
+
+                        <div className='list-group'>
+                            {
+                                this.state.sizes.map((size) => {
+                                    return this.renderSizeAttributes(size);
+                               })
+                            }
+                        </div>
 
                        <span className="form-error"><strong>{this.state.errors["size"]}</strong></span>
                        <div className='form-group'>
@@ -191,26 +216,35 @@ class ProductDetails extends Component {
                     className="btn btn-info btn-block">
                     Back to Store
                 </Link>
-                <button type="button"
+                <button disabled={this.state.disabled} type="button"
                         className="btn btn-success btn-block"
-                        onClick={()=>this.addProductToCart(product.product_id)}>
-                    Add To Cart
+                        onClick={()=>this.addProductToCart(product.product_id)}> { this.state.loading && <img width = '15%' src={window.location.origin + '/Spinner.gif'} alt='addimagetocart' /> }
+                     Add To Cart
                 </button>
             </div>
         );
     };
 
     render(){
-        const {product} = this.props.ProductsStore;
+        const {product, isLoading} = this.props.ProductsStore;
         return(
             <div className='view-container'>
                 <div className='container'>
-                    <Navbar/>
-                    <div className='col-md-9'>
-                        {product && this.renderContent()}
+                    <div className='row'>
+                        <Navbar/>
+                        <NotificationContainer/>
                     </div>
-                    <div className='col-md-3'>
-                        {product && this.renderSideBar()}
+                    <div className='row'>
+                        <div className='col-md-9'>
+                            {
+                                isLoading ? <Loader type="ThreeDots" color="#2BAD60" height="100" width="100" /> :
+                                product && this.renderContent()
+
+                            }
+                        </div>
+                        <div className='col-md-3'>
+                            {product && this.renderSideBar()}
+                        </div>
                     </div>
                 </div>
             </div>

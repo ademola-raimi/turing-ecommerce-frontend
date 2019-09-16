@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Link, browserHistory } from 'react-router';
-import _ from 'lodash';
-import api from '../config/config.js';
+import { browserHistory } from 'react-router';
 import { fetchOrder } from '../actions/Order';
 import { isLoggedIn } from '../helpers/helper';
 import Navbar from './Navbar';
@@ -37,39 +35,58 @@ class OrderDetails extends Component {
 
     renderContent = (order)=>{
         return(
-            <div class="panel panel-default">
-              <div class="panel-heading">Order Id: <br/>{order.order_id}</div>
-              <div class="panel-body">
-                <p>Total amount: <br/>{order.total_amount}</p>
-              </div>
-
-              <ul class="list-group">
-                <li class="list-group-item">Created At: {order.created_on}</li>
-                <li class="list-group-item">Shipped On: {order.shipped_on}</li>
-                <li class="list-group-item">Comment: {order.comment}</li>
-                <li class="list-group-item">{order.tax_id == 1 ? "Paid Tax" : "No Tax"}</li>
-                <li class="list-group-item"></li>
-              </ul>
+            <div className="table-responsive">
+                <table className="table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Order Id:</td>
+                            <td>{order.order_id}</td>
+                        </tr>
+                        <tr>
+                            <td>Total amount:</td>
+                            <td>{order.total_amount}</td>
+                        </tr>
+                        <tr>
+                            <td>Created At:</td>
+                            <td>{order.created_on}</td>
+                        </tr>
+                        <tr>
+                            <td>Shipped On:</td>
+                            <td>{order.shipped_on}</td>
+                        </tr>
+                        <tr>
+                            <td>Comment:</td>
+                            <td>{order.comment}</td>
+                        </tr>
+                        <tr>
+                            <td>{order.tax_id === 1 ? "Paid Tax" : "No Tax"}</td>
+                            <td> </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         );
     };
-
 
     render(){
         const { order } = this.props.OrderStore;
         return(
             <div className='view-container'>
                 <div className='container'>
-                    <Navbar/>
-                    <h2>Order Details</h2>
-                    <div className="row">
-                    <div className='col-md-9'>
-                        {order && this.renderContent(order)}
+                    <div className='row'>
+                        <Navbar/>
                     </div>
+                    <div className="row">
+                        <div className='col-md-12'>
+                            <h2 className="text-center-sm">Order Details</h2>
+                        </div>
+                        <div className='col-md-12'>
+                            {order && this.renderContent(order)}
+                        </div>
+
                     </div>
                 </div>
             </div>      
-
         )};
 };
 

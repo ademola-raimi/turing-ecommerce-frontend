@@ -3,9 +3,9 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { searchProducts } from '../actions/Products';
 
-class Search extends Component{
+class Search extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -17,13 +17,13 @@ class Search extends Component{
     };
 
 
-    handleSubmit = (e)=>{
+    handleSubmit = (e)=> {
         
         e.preventDefault();
         this.props.actions.searchProducts(true, this.state.searchValue);
     };
 
-    onSearchInputChange = (e)=>{
+    onSearchInputChange = (e)=> {
         const searchValue = e.target.value;
         this.setState({
             searchValue
@@ -31,27 +31,25 @@ class Search extends Component{
 
     };
 
-    render(){
+    render() {
         return(
             <div className="well blosd">
                 <h3 className="lead"> 
                     Quick Shop 
                 </h3>
-                <div className="input-group">
-                    <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSubmit}>
+                    <div className="input-group" id="sidebar">
                         <input 
                             type="text"
                             className="form-control"
                             value={this.state.searchValue}    
                             onChange={this.onSearchInputChange}
                         />
-                        <span className="input-group-btn search-gly">
-                        <button className="btn btn-default">
-                            <span className="glyphicon glyphicon-search" />
-                        </button>
-                    </span>
-                    </form>
-                </div>
+                        <span className="input-group-btn">
+                            <button className="btn btn-default inside"><span className="glyphicon glyphicon-search"></span></button>
+                        </span>
+                    </div>
+                </form>
             </div>
         );
     };

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {Link,withRouter} from 'react-router';
-import {compose} from 'redux';
-import classNames from 'classnames';
+import {Link} from 'react-router';
 import { fetchCategories } from '../actions/Categories';
 import { fetchProductsCategory } from '../actions/Products';
 import { bindActionCreators } from 'redux';
+import Loader from 'react-loader-spinner';
 import _ from 'lodash';
 
 
@@ -16,10 +15,6 @@ import _ from 'lodash';
         super(props);
         this.state = {
             ...props,
-            modalOpen: false,
-            searchTerm: null,
-            selected: [],
-            confirmDelete: false,
             activeCategoryId: null
         };
     }
@@ -40,7 +35,7 @@ import _ from 'lodash';
     }
 
     renderCategory = (category,index)=>{
-        const linkClass = (this.state.activeCategoryId == category.category_id) ? "list-group-item active" : "list-group-item"
+        const linkClass = (this.state.activeCategoryId === category.category_id) ? "list-group-item active" : "list-group-item"
         return(
             <Link
                 to='#'
@@ -53,10 +48,11 @@ import _ from 'lodash';
     };
 
     render() {
-        const { allCategories } = this.props.CategoryStore;
+        const { allCategories, isLoading } = this.props.CategoryStore;
         return (
             <div className="well">
                 <h4>Categories</h4>
+                {isLoading ? <Loader type="ThreeDots" className="loader" /> :
                 <div className="list-group">
                     <Link
                         to='#'
@@ -67,13 +63,13 @@ import _ from 'lodash';
                     </Link>
                     {
                         allCategories.map((category,index)=>{
-
-                        return this.renderCategory(category,index);
-                    })
-                }
-                </div>
+                            return this.renderCategory(category,index);
+                        })
+                    }
+                </div>}
             </div>
-    )};
+        )
+    };
 };
 
 function mapStateToProps(state) {

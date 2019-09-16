@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Link, browserHistory } from 'react-router';
+import { browserHistory } from 'react-router';
 import _ from 'lodash';
 import api from '../config/config.js';
 import Navbar from './Navbar';
 import { updateAddress, customerDetails, updateRegionAddress, updateCreditCard } from '../actions/Customers';
 import { fetchShippingRegions, shippingPrice } from '../actions/Shipping';
-import { totalPrice, emptyCart } from '../actions/ShoppingCart';
+import { totalPrice, emptyCart, allCarts } from '../actions/ShoppingCart';
 import { fetchTax, createOrder, makePayment } from '../actions/Order';
 import { validateEmail } from '../helpers/helper';
 import { Elements, StripeProvider } from 'react-stripe-elements';
 import { isLoggedIn } from '../helpers/helper';
 import CheckoutForm from './CheckoutForm';
+import 'react-notifications/lib/notifications.css';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class Checkout extends Component {
 	constructor (props) {
@@ -32,8 +34,7 @@ class Checkout extends Component {
                 day_phone: '',
                 eve_phone: '',
                 mob_phone: '',
-                credit_card: '',
-                region: ''
+                credit_card: ''
             },
             errors: {},
             classShipping: "disabled",
@@ -56,7 +57,8 @@ class Checkout extends Component {
             initialCost: 0,
             initialTax: 0,
             description: "description",
-            currency: "USD"
+            currency: "USD",
+            stripe: null
         };
     }
 
@@ -65,38 +67,67 @@ class Checkout extends Component {
             this.renderRedirect();
             return;
         }
+        if (window.Stripe) {
+          this.setState({stripe: window.Stripe('pk_test_DG2pwJ0MPW0qldYUTBRmOiKE00fMMnA5hh')});
+        } else {
+          document.querySelector('#stripe-js').addEventListener('load', () => {
+            // Create Stripe instance once Stripe.js loads
+            this.setState({stripe: window.Stripe('pk_test_DG2pwJ0MPW0qldYUTBRmOiKE00fMMnA5hh')});
+          });
+        }
         this.props.actions.customerDetails();
         this.props.actions.fetchShippingRegions();
         this.props.actions.fetchTax();
+        this.props.actions.allCarts();
     }
 
     shouldComponentUpdate (nextProps, nextState, nextContent) {
         if (_.isNil(this.props.CustomerStore.activeCustomer) && !_.isNil(nextProps.CustomerStore.activeCustomer)) {
-                const { activeCustomer } = nextProps.CustomerStore;
-                this.setState({
-                    data: {
-                        name: activeCustomer.name,
-                        email: activeCustomer.email,
-                        address1: activeCustomer.address_1,
-                        address2: activeCustomer.address_2,
-                        city: activeCustomer.city,
-                        region: activeCustomer.region,
-                        postal_code: activeCustomer.postal_code,
-                        country: activeCustomer.country,
-                        shipping_region_id: activeCustomer.shipping_region_id,
-                        day_phone: activeCustomer.day_phone,
-                        eve_phone: activeCustomer.eve_phone,
-                        credit_card: activeCustomer.credit_card,
-                        mob_phone: activeCustomer.mob_phone,
-                    },
-                    totalAmount: nextProps.ShoppingCartStore.totalAmount
-                })
+            const { activeCustomer } = nextProps.CustomerStore;
+            this.setState({
+                data: {
+                    name: activeCustomer.name,
+                    email: activeCustomer.email,
+                    address1: activeCustomer.address_1,
+                    address2: activeCustomer.address_2,
+                    city: activeCustomer.city,
+                    region: activeCustomer.region,
+                    postal_code: activeCustomer.postal_code,
+                    country: activeCustomer.country,
+                    shipping_region_id: activeCustomer.shipping_region_id,
+                    day_phone: activeCustomer.day_phone,
+                    eve_phone: activeCustomer.eve_phone,
+                    credit_card: activeCustomer.credit_card,
+                    mob_phone: activeCustomer.mob_phone,
+                },
+                totalAmount: nextProps.ShoppingCartStore.totalAmount
+            })
         }
 
         if (!_.isEqual(nextProps.ShoppingCartStore.totalAmount, this.props.ShoppingCartStore.totalAmount)) {
             this.setState({
                 totalAmount: nextProps.ShoppingCartStore.totalAmount
             })
+        }
+
+        if (!_.isEqual(nextProps.CustomerStore.hasError, this.props.CustomerStore.hasError)) {
+            NotificationManager.error('Something went wrong', 'Customer');
+        }
+
+        if (!_.isEqual(nextProps.CustomerStore.addressUpdated, this.props.CustomerStore.addressUpdated)) {
+            NotificationManager.success('Successfully updated Address details', 'Customer');
+        }
+
+        if (!_.isEqual(nextProps.CustomerStore.regionUpdated, this.props.CustomerStore.regionUpdated)) {
+            NotificationManager.error('Successfully updated region', 'Customer');
+        }
+
+        if (!_.isEqual(nextProps.OrderStore.paymentSuccess, this.props.OrderStore.paymentSuccess)) {
+            NotificationManager.success('Your order was successfull', 'Order');
+        }
+
+        if (!_.isEqual(nextProps.OrderStore.hasError, this.props.OrderStore.hasError)) {
+            NotificationManager.error('Something went wrong', 'Order');
         }
 
         return true;
@@ -244,7 +275,7 @@ class Checkout extends Component {
             formIsValid = false;
             errors["country"] = 'Country is required.';
         }
-        if (!fields["region"] || fields["region"] == "Please Select") {
+        if (!fields["region"] || fields["region"] === "Please Select") {
             formIsValid = false;
             errors["region"] = 'Region is required.';
         }
@@ -336,7 +367,7 @@ class Checkout extends Component {
                 <label htmlFor="region">Region</label>
                 <select onChange={this.handleShippingRegion} className="form-control">
                    {shippingRegions && (shippingRegions.map((shippingRegion) => {
-                        return <option selected={(shippingRegion.shipping_region == this.state.data.region) ? "selected" : ""} name={shippingRegion.shipping_region} value={shippingRegion.shipping_region_id}>{shippingRegion.shipping_region}</option>;
+                        return <option selected={(shippingRegion.shipping_region === this.state.data.region) ? "selected" : ""} name={shippingRegion.shipping_region} value={shippingRegion.shipping_region_id}>{shippingRegion.shipping_region}</option>;
                    }))}
                </select>
                <span className="form-error"><strong>{this.state.errors["region"]}</strong></span>
@@ -401,8 +432,9 @@ class Checkout extends Component {
     }
 
     renderOrderDetailsForm = () => {
-        const cartsInfo = JSON.parse(localStorage.getItem('cartsInfo'));
-        const { shippingInfo, shippingRegions } = this.props.ShippingStore
+        const cartsInfo = this.props.ShoppingCartStore.allCarts;
+
+        const { shippingInfo } = this.props.ShippingStore
         const { taxes } = this.props.OrderStore
 
         return (
@@ -480,14 +512,15 @@ class Checkout extends Component {
     renderOrderPage() {
         const { orderId } = this.props.OrderStore
         if (this.props.OrderStore.paymentSuccess) {
+            NotificationManager.success('Your order was successfull', 'Order');
             alert("Your order was succesfull")
+
             this.props.actions.emptyCart();
-            localStorage.removeItem('cartId');
-            localStorage.removeItem('cartsInfo');
+            // localStorage.removeItem('cartId');
             return (
                 browserHistory.push('/order/' + orderId)
             )
-         } else if(this.props.OrderStore.paymentSuccess == "failed") {
+         } else if(this.props.OrderStore.paymentSuccess === "failed") {
             alert("Payment failed, please try again")
             return null;
         } else {
@@ -497,7 +530,7 @@ class Checkout extends Component {
 
     renderCheckOutForm = () => {
         return (
-            <StripeProvider apiKey="pk_test_DG2pwJ0MPW0qldYUTBRmOiKE00fMMnA5hh">
+            <StripeProvider stripe={this.state.stripe}>
                 <div className="example">
                   <Elements>
                     <CheckoutForm
@@ -511,40 +544,41 @@ class Checkout extends Component {
 
 	render() {
 		return (
-			<div className="view-container">
-			<div className='row'>
-				<Navbar/>
-            </div>
-        	<div className="container">
-           		<div className='row'>
-					<div>
-					    <ul className="nav nav-tabs" role="tablist">
-						    <li role="presentation" className={this.state.adressActive}><a href="#address" aria-controls="address" role="tab" data-toggle="tab">ADDRESS DETAILS</a></li>
-						    <li className={this.state.classShipping} role="presentation"><a href={this.state.shipping} aria-controls="shipping" role="tab" data-toggle={this.state.tabShipping}>SHIPPING DETAILS</a></li>
+            <div className="view-container">
+			     <div className="container">
+        			<div className='row'>
+        				<Navbar/>
+                        <NotificationContainer/>
+                    </div>
+               		<div className='row'>
+    					<div className="checkout-tab">
+    					    <ul className="nav nav-tabs" role="tablist">
+    						    <li role="presentation" className={this.state.adressActive}><a href="#address" aria-controls="address" role="tab" data-toggle="tab">ADDRESS DETAILS</a></li>
+    						    <li className={this.state.classShipping} role="presentation"><a href={this.state.shipping} aria-controls="shipping" role="tab" data-toggle={this.state.tabShipping}>SHIPPING DETAILS</a></li>
 
-                            <li className={this.state.classOrder} role="presentation"><a href={this.state.order} aria-controls="order" role="tab" data-toggle={this.state.tabOrder}>ORDER DETAILS</a></li>
+                                <li className={this.state.classOrder} role="presentation"><a href={this.state.order} aria-controls="order" role="tab" data-toggle={this.state.tabOrder}>ORDER DETAILS</a></li>
 
-						    <li className={this.state.classPayout} role="presentation"><a href={this.state.payout} aria-controls="payout" role="tab" data-toggle={this.state.tabPayout}>PAYMENT DETAILS</a></li>
-					    </ul>
+    						    <li className={this.state.classPayout} role="presentation"><a href={this.state.payout} aria-controls="payout" role="tab" data-toggle={this.state.tabPayout}>PAYMENT DETAILS</a></li>
+    					    </ul>
 
-						<div className="tab-content">
-						    <div role="tabpanel" className={this.state.panelAddress} id="address">
-						    	{this.renderAddressDetailsForm()}
-						    </div>
-						    <div role="tabpanel" className={this.state.panelShipping} id="shipping">
-                                {this.renderShippingDetailsForm()}
-						    </div>
-                            <div role="tabpanel" className={this.state.panelOrder} id="order">
-                                {this.renderOrderDetailsForm()}
-                            </div>
-						    <div role="tabpanel" className={this.state.panelPayout} id="payout">
-                                {this.renderCheckOutForm()}
-						    </div>
-						</div>
-					</div>
-				</div>
-			</div>
-            {this.renderOrderPage()}
+    						<div className="tab-content">
+    						    <div role="tabpanel" className={this.state.panelAddress} id="address">
+    						    	{this.renderAddressDetailsForm()}
+    						    </div>
+    						    <div role="tabpanel" className={this.state.panelShipping} id="shipping">
+                                    {this.renderShippingDetailsForm()}
+    						    </div>
+                                <div role="tabpanel" className={this.state.panelOrder} id="order">
+                                    {this.renderOrderDetailsForm()}
+                                </div>
+    						    <div role="tabpanel" className={this.state.panelPayout} id="payout">
+                                    {this.renderCheckOutForm()}
+    						    </div>
+    						</div>
+    					</div>
+    				</div>
+                    {this.renderOrderPage()}
+                </div>
 			</div>
 		);
 	}
@@ -574,6 +608,7 @@ function mapDispatchToProps(dispatch) {
                 totalPrice,
                 createOrder,
                 makePayment,
+                allCarts,
                 emptyCart,
             },
             dispatch

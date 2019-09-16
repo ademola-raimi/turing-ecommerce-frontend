@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Link} from 'react-router';
 import _ from 'lodash';
+import Loader from 'react-loader-spinner';
 import api from '../config/config.js';
 import debounce from "lodash.debounce";
 import { fetchProducts, fetchAttributes, fetchProductsCategory, fetchProductsDepartment, searchProducts } from '../actions/Products';
@@ -51,6 +52,7 @@ class Products extends Component {
 
     shouldComponentUpdate (nextProps, nextState, nextContent) {
         if (!_.isEqual(nextProps.ProductsStore.allProducts, this.props.ProductsStore.allProducts)) {
+            console.log(nextProps.ProductsStore.allProducts);
             this.setState({
                 products: nextProps.ProductsStore.allProducts,
             })
@@ -65,44 +67,49 @@ class Products extends Component {
         return true;
     }
 
-    renderProducts = (product,index)=>{
+    renderProducts = (product,index) => {
         return (
-            <div className='col-sm-4 col-lg-4 col-md-4 book-list' key={index}>
-                <div className="thumbnail">
-                <Link to={`/product/${product.product_id}`}>
-                    <img className='img-thumbnail'
-                        src={api.cloudinary_path + product.thumbnail}
-                        alt={product.name}
-                    />
-                 </Link>
-                </div>
-                <div className="caption">
-                    <h4>
-                        <Link to={`./product/${product.product_id}`}>
-                            {product.name}
-                        </Link>
-                    </h4>
-                    <p> {product.description}</p>
-                    <h4 >
-                        ${product.discounted_price == '0.00' ? product.price : product.discounted_price}
-                    </h4>
-                    <h4 ><strike>
-                        {product.discounted_price != '0.00' ? '$'+product.price : ''}
-                   </strike> </h4>
+            <div className='col-sm-4 col-lg-4 col-md-4' key={index}>
+                <div className="book-full">
+                    <div className="book-list">
+                        <div className="image-box">
+                        <Link to={`/product/${product.product_id}`}>
+                            <img
+                                src={api.cloudinary_path + product.thumbnail}
+                                alt={product.name}
+                            />
+                         </Link>
+                        </div>
+                    </div>
+                    <div className="caption">
+                        <h4>
+                            <Link to={`/product/${product.product_id}`}>
+                                {product.name}
+                            </Link>
+                        </h4>
+                        <p> {product.description}</p>
+                        <h5 >
+                            ${product.discounted_price === '0.00' ? product.price : product.discounted_price}
+                        </h5>
+                        <h5 ><strike>
+                            {product.discounted_price !== '0.00' ? '$'+product.price : ''}
+                       </strike> </h5>
+                    </div>
                 </div>
             </div>
         );
     };
 
     render(){
+        const isFetching = this.props.ProductsStore.isLoading
         return(
         <div>
+
             <div className="books row">
-                {
-                    this.state.products.length > 0 ? this.state.products.map((product,index)=>{
+            {isFetching ? <Loader type="ThreeDots" className="loader" /> :
+            this.state.products.length > 0 ? this.state.products.map((product,index)=>{
                         return this.renderProducts(product,index);
-                    }) : "No product to display"
-                }
+                    }) : "No product to display"}
             </div>
             <div className="row">
                 <div className="col-md-12">

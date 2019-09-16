@@ -7,6 +7,7 @@ import ShoppingCartReducer from '../reducers/ShoppingCart';
 import CustomerReducer from '../reducers/Customers';
 import OrderReducer from '../reducers/Order';
 import ShippingReducer from '../reducers/Shipping';
+import AttributesReducer from '../reducers/Attributes';
 
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../sagas/rootSaga';
@@ -23,7 +24,8 @@ const store = createStore(
         ShoppingCart: ShoppingCartReducer,
         Customer: CustomerReducer,
         Shipping: ShippingReducer,
-        Order: OrderReducer
+        Order: OrderReducer,
+        Attributes: AttributesReducer
     }),composeEnhancers(applyMiddleware(sagaMiddleware))
 );
 sagaMiddleware.run(rootSaga);

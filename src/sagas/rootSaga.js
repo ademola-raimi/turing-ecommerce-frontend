@@ -6,6 +6,7 @@ import * as ShoppingCartSagas from './ShoppingCart';
 import * as CustomersSagas from './Customers';
 import * as OrderSagas from './Order';
 import * as ShippingSagas from './Shipping';
+import * as AttributesSagas from './Attributes';
 
 // import watchers from other files
 export default function* rootSaga() {
@@ -16,7 +17,8 @@ export default function* rootSaga() {
         ...Object.values(CustomersSagas),
         ...Object.values(DepartmentSagas),
         ...Object.values(OrderSagas),
-        ...Object.values(ShippingSagas)
+        ...Object.values(ShippingSagas),
+        ...Object.values(AttributesSagas)
         // add other watchers to the array
     ].map(fork));
 }

@@ -463,7 +463,7 @@ class Checkout extends Component {
                             </tbody>
                         </table>
                     </div>
-                    <div className="form-group">
+                    <div className="form-group margin-top-20">
                         <label htmlFor="shippinginfo">Shipping Type</label>
                         <select onChange={this.handleShipping} className="form-control">
                             <option data-key="0" value="">Select shipping type </option>

@@ -213,11 +213,11 @@ class ProductDetails extends Component {
                     </div>
                </div>
                <Link to="/"
-                    className="btn btn-default">
+                    className="btn btn-default btn-block">
                     Back to Store
                 </Link>
                 <button disabled={this.state.disabled} type="button"
-                        className="btn btn-inverse product"
+                        className="btn btn-inverse product btn-block"
                         onClick={()=>this.addProductToCart(product.product_id)}> { this.state.loading && <img width = '15%' src={window.location.origin + '/Spinner.gif'} alt='addimagetocart' /> }
                      Add To Cart
                 </button>

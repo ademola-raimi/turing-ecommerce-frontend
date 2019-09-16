@@ -829,10 +829,19 @@ a.badge:focus, a.badge:hover {
     background-color: #fff;
 }
 .nav-tabs{
-    border: none;
+    border-bottom: 1px solid #ddd;
+}
+.nav-tabs>li>a{
+    color: #6c6c6c;
+}
+.nav>li>a:focus, .nav>li>a:hover{
+    outline: none;
 }
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
     border: none;
+    color: #6c6c6c;
+    background-color: #eee;
+    outline: none;
 }
 .panel-title{
     color: #6c6c6c;

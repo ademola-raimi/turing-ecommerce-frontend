@@ -7,10 +7,14 @@ import {
     FETCH_PRODUCTS_DEPARTMENT
 } from '../actions/types';
 
-export const fetchProducts = (resetList, page) => ({
+export const fetchProducts = (resetList, page, size, color, minPrice, maxPrice) => ({
     type: FETCH_PRODUCTS,
     resetList,
-    page
+    page,
+    size,
+    color,
+    minPrice,
+    maxPrice
 });
 
 export const fetchAttributes = (productId) => ({

@@ -25,10 +25,16 @@ export default function ShippingReducer (state = initialState, action) {
             newState = Object.assign({}, state, { shippingInfo: action.response.data });
             return newState;
 
+        case FETCH_SHIPPING_REGION:
+        case FETCH_SHIPPING_REGION_PRICE:
+            newState = Object.assign({}, state, { isLoading:  true });
+            return state;
+
         case FETCH_SHIPPING_REGION_PRICE_FAILED:
         case FETCH_SHIPPING_REGION_FAILED:
             newState = Object.assign({}, state, { hasError: true});
             return newState;
+
         default:
             return state;
     }

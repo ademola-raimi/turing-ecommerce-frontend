@@ -4,8 +4,6 @@ import {
     FETCH_DEPARTMENTS_FAILED
 } from '../actions/types';
 
-import _ from 'lodash';
-
 const initialState = {
     hasError: false,
     isLoading: true,
@@ -27,17 +25,12 @@ export default function departmentReducer(state = initialState, action) {
     let newState = state;
     switch (action.type) {
         case FETCH_DEPARTMENTS_RECEIVED:
-            // reset if there is a new search or we need to see the full list again
-            if(action.resetList){
-                state.allDepartments = [];
-            }
-            // concatenate the array of videos returned to the existing list for infinite scroll
-            const allDepartments = _.concat(state.allDepartments, action.response.data);
-            newState = Object.assign({}, state, { isLoading: false, allDepartments: allDepartments });
+            newState = Object.assign({}, state, { isLoading: false, allDepartments: action.response.data });
             return newState;
 
         case FETCH_DEPARTMENTS:
-            return state;
+            newState = Object.assign({}, state, { isLoading:  true });
+            return newState;
 
         case FETCH_DEPARTMENTS_FAILED:
             newState = Object.assign({}, state, { isLoading:  false, hasError: true });

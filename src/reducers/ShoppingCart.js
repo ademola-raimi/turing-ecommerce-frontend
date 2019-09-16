@@ -25,8 +25,6 @@ import {
     UPDATE_QUANTITY
 } from '../actions/types';
 
-import _ from 'lodash';
-
 const initialState = {
     hasError: false,
     isLoading: true,
@@ -36,7 +34,9 @@ const initialState = {
     totalCartItem: 0,
     allCarts: [],
     isBasketEmpty: false,
-    removeProduct: false
+    removeProduct: false,
+    item: {},
+    emptyCart: false
   }
 
 export default function categoryReducer(state = initialState, action) {
@@ -47,12 +47,10 @@ export default function categoryReducer(state = initialState, action) {
             return newState;
 
         case SAVE_CART_RECIEVED:
-            localStorage.setItem("cartsInfo", JSON.stringify(action.response.data));
-            newState = Object.assign({}, state, { isLoading: false, totalCartItem: action.response.data.length} );
+            newState = Object.assign({}, state, { isLoading: false, totalCartItem: action.response.data.length, emptyCart: false } );
             return newState;
 
         case TOTAL_AMOUNT_RECIEVED:
-
             newState = Object.assign({}, state, { isLoading: false, totalAmount: action.response.data.total_amount.toFixed(2) });
             return newState;
 
@@ -62,17 +60,16 @@ export default function categoryReducer(state = initialState, action) {
             return newState;
 
         case FETCH_ALL_CARTS_RECEIVED:
-            localStorage.setItem("cartsInfo", JSON.stringify(action.response.data));
             const isBasketEmpty = action.response.data.length > 0 ? false : true;
-            newState = Object.assign({}, state, { isLoading: false, allCarts: action.response.data, isBasketEmpty: isBasketEmpty, removeProduct: false});
+            newState = Object.assign({}, state, { isLoading: false, allCarts: action.response.data, isBasketEmpty: isBasketEmpty, removeProduct: false, emptyCart: false});
             return newState;
 
         case EMPTY_CARTS_RECEIVED:
-            newState = Object.assign({}, state, { isLoading: false, allCarts: [], isBasketEmpty: true, totalCartItem: 0, totalAmount: 0});
+            newState = Object.assign({}, state, { isLoading: false, allCarts: [], isBasketEmpty: true, emptyCart: true, totalCartItem: 0, totalAmount: 0});
             return newState;
 
         case UPDATE_QUANTITY_RECEIVED:
-            newState = Object.assign({}, state, { isLoading: false });
+            newState = Object.assign({}, state, { isLoading: false, item: action.response.data });
             return newState;
 
         case REMOVE_PRODUCT_RECEIVED:
@@ -96,11 +93,10 @@ export default function categoryReducer(state = initialState, action) {
         case UPDATE_QUANTITY_FAILED:
         case REMOVE_PRODUCT_FAILED:
         case EMPTY_CARTS_FAILED:
-        case FETCH_ALL_CARTS_FAILED:
         case FECTH_CART_COUNT_FAILED:
         case FETCH_CART_ID_FAILED:
         case TOTAL_AMOUNT_FAILED:
-        case FETCH_CART_ID_FAILED:
+        case SAVE_CART_FAILED:
             newState = Object.assign({}, state, { isLoading:  false, hasError: true });
             return newState;
 

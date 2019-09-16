@@ -53,7 +53,7 @@ export default function productReducer(state = initialState, action) {
             if(action.resetList){
                 state.allProducts = [];
             }
-            if (action.response.data.data.length == 0) {
+            if (action.response.data.data.length === 0) {
                  state.hasMore = false
             }
             state.page += 1
@@ -73,6 +73,7 @@ export default function productReducer(state = initialState, action) {
             state.searchPage += 1
             // concatenate the array of videos returned to the existing list for infinite scroll
             allProducts = _.concat(state.allProducts, action.response.data.data);
+            // console.log(allProducts)
             newState = Object.assign({}, state, { isLoading: false, isProductLoading: false, allProducts: allProducts, fetchProductsCategory: false, fetchProductssearch: true, searchValue: action.searchValue});
             return newState;
 
@@ -104,7 +105,9 @@ export default function productReducer(state = initialState, action) {
         case FETCH_PRODUCTS_CATEGORY:
         case FETCH_ATTRIBUTES:
         case FETCH_PRODUCT:
+        case SEARCH_PRODUCT:
         case FETCH_PRODUCTS:
+            newState = Object.assign({}, state, { isLoading:  true });
             return state;
 
         case FETCH_PRODUCTS_DEPARTMENT_FAILED:

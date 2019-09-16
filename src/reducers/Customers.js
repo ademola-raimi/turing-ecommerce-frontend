@@ -22,7 +22,8 @@ const initialState = {
     registerSuccess: false,
     hasError: false,
     activeCustomer: null,
-    message: "Registration failed"
+    regionUpdated: false,
+    addressUpdated: false
 };
 
 export default function CustomerReducer (state = initialState, action) {
@@ -45,12 +46,18 @@ export default function CustomerReducer (state = initialState, action) {
             newState = Object.assign({}, state, { hasError: true});
             return newState;
         case UPDATE_ADDRESS_RECEIVED:
-            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false});
+            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false, addressUpdated: true});
             return newState;
 
         case UPDATE_REGION_ADDRESS_RECEIVED:
-            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false});
+            newState = Object.assign({}, state, {activeCustomer: action.response.data, hasError: false, regionUpdated: true});
             return newState;
+
+        case FETCH_CUSTOMER_DETAILS:
+        case UPDATE_ADDRESS:
+        case UPDATE_REGION_ADDRESS:
+            newState = Object.assign({}, state, { isLoading:  true });
+            return state;
 
         case TOKEN_FAILED:
         case UPDATE_REGION_ADDRESS_FAILED:

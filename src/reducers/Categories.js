@@ -4,8 +4,6 @@ import {
     FETCH_CATEGORIES_FAILED
 } from '../actions/types';
 
-import _ from 'lodash';
-
 const initialState = {
     hasError: false,
     isLoading: true,
@@ -27,18 +25,12 @@ export default function categoryReducer(state = initialState, action) {
     let newState = state;
     switch (action.type) {
         case FETCH_CATEGORIES_RECEIVED:
-            const totalCategories = action.response.data.total;
-            // reset if there is a new search or we need to see the full list again
-            if(action.resetList){
-                state.allCategories = [];
-            }
-            // concatenate the array of videos returned to the existing list for infinite scroll
-            const allCategories = _.concat(state.allCategories, action.response.data.data);
-            newState = Object.assign({}, state, { isLoading: false, allCategories: allCategories, totalCategories: totalCategories });
+            newState = Object.assign({}, state, { isLoading: false, allCategories: action.response.data.data });
             return newState;
 
         case FETCH_CATEGORIES:
-            return state;
+            newState = Object.assign({}, state, { isLoading:  true });
+            return newState;
 
         case FETCH_CATEGORIES_FAILED:
             newState = Object.assign({}, state, { isLoading:  false, hasError: true });

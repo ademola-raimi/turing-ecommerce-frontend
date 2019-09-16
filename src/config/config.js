@@ -6,10 +6,11 @@ module.exports = {
     cloudinary_path: 'https://res.cloudinary.com/demola/image/upload/v1563150887/turing/',
     categories_path: '/categories',
     departments_path: '/departments',
-    attributes_path: '/attributes',
     shoppingCart_path: '/shoppingcart',
     customers_path: '/customers',
     customer_path: '/customer',
     shipping_path: '/shipping/regions',
-    orders_path: '/orders'
+    orders_path: '/orders',
+    attributes_path: '/attributes',
+    attributes_value_path: '/attributes/values'
 }

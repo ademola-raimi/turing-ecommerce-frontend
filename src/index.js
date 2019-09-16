@@ -6,7 +6,6 @@ import {Provider} from 'react-redux';
 import {browserHistory,Router,Route} from 'react-router';
 import {syncHistoryWithStore} from 'react-router-redux';
 import { Layout, Basket, Products, ProductDetails, Login, Register, Checkout, Orders, OrderDetails } from './Containers';
-import {Elements, StripeProvider} from 'react-stripe-elements';
 
 const history = syncHistoryWithStore(browserHistory,store);
 const jsx = (

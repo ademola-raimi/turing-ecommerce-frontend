@@ -3,6 +3,8 @@ import { put, takeLatest, call } from 'redux-saga/effects';
 import { default as axios } from '../api/axios-api';
 import jwtDecode from 'jwt-decode';
 import api from '../config/config.js';
+import authApiHelper from '../api/authApiHelper.js';
+import customerApiHelper from '../api/customerApiHelper.js';
 
 import {
     FETCH_TOKEN,
@@ -23,30 +25,20 @@ import {
     UPDATE_REGION_ADDRESS_FAILED
  } from '../actions/types';
 
- function fetchAuthenticationApi(data) {
-    let url = api.api_path + api.version_path + api.customers_path + "/login";
-    let credentials = {
-        "email": data.payload.email,
-        "password": data.payload.password
-    }
-
-    return axios.post(url, credentials);
-}
-
 function* getAndSetToken(action) {
     try {
-        const response = yield call(fetchAuthenticationApi, action);
+        const response = yield call(authApiHelper.fetchAuthenticationApi, action);
         const token = response.data.accessToken
         let decoded = jwtDecode(token);
         let customerId = decoded.customer_id;
         localStorage.setItem("customerId", customerId);
         localStorage.setItem("token", token);
         localStorage.setItem("customerName", response.data.customer.name);
-        yield put({ type: SET_CUSTOMER_ID, customerId });
         yield put({ type: TOKEN, response });
+        yield put({ type: SET_CUSTOMER_ID, customerId });
     }
     catch(error) {
-        console.error(error)
+        console.error("error",error)
         yield put({ type: TOKEN_FAILED, error });
     }
 }
@@ -64,7 +56,7 @@ function registerCustomerApi(data) {
 
 function* registerCustomer(action) {
     try {
-        const response = yield call(registerCustomerApi, action);
+        const response = yield call(authApiHelper.registerCustomerApi, action);
         yield put({ type: REGISTER_SUCCESSFUL, response });
     }
     catch(error) {
@@ -73,43 +65,20 @@ function* registerCustomer(action) {
     }
 }
 
-function fetchCustomerApi(data) {
-    let url = api.api_path + api.version_path + api.customer_path;
-
-    return axios({
-        method: "get",
-        url: url,
-        crossdomain: true
-    });
-}
-
 function* fetchCustomer(action) {
     try {
-        const response = yield call(fetchCustomerApi, action);
+        const response = yield call(customerApiHelper.fetchCustomerApi, action);
         yield put({ type: FETCH_CUSTOMER_DETAILS_RECEIVED, response });
     }
     catch(error) {
-        console.error(error)
+        console.error("error: ",error)
         yield put({ type: FETCH_CUSTOMER_DETAILS_FAILED, error });
     }
-}
-
-function updateCustomerAddressApi(data) {
-    let url = api.api_path + api.version_path + api.customer_path;
-    let credentials = {
-        "name": data.payload.name,
-        "email": data.payload.email,
-        "mob_phone": data.payload.mob_phone,
-        "day_phone": data.payload.day_phone,
-        "eve_phone": data.payload.eve_phone
-    }
-
-    return axios.put(url, credentials);
 }
 
 function* updateCustomerAddress(action) {
     try {
-        const response = yield call(updateCustomerAddressApi, action);
+        const response = yield call(customerApiHelper.updateCustomerAddressApi, action);
         yield put({ type: FETCH_CUSTOMER_DETAILS_RECEIVED, response });
     }
     catch(error) {
@@ -118,25 +87,9 @@ function* updateCustomerAddress(action) {
     }
 }
 
-
-function updateRegionCustomerAddressApi(data) {
-    let url = api.api_path + api.version_path + api.customers_path + '/address';
-    let credentials = {
-        "address_1": data.payload.address1,
-        "address_2": data.payload.address2,
-        "city": data.payload.city,
-        "region": data.payload.region,
-        "postal_code": data.payload.postal_code,
-        "country": data.payload.country,
-        "shipping_region_id": data.payload.shipping_region_id
-    }
-
-    return axios.put(url, credentials);
-}
-
 function* updateRegionCustomerAddress(action) {
     try {
-        const response = yield call(updateRegionCustomerAddressApi, action);
+        const response = yield call(customerApiHelper.updateRegionCustomerAddressApi, action);
         yield put({ type: FETCH_CUSTOMER_DETAILS_RECEIVED, response });
     }
     catch(error) {

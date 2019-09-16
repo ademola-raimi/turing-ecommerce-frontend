@@ -1,7 +1,6 @@
 import { put, takeLatest, call } from 'redux-saga/effects';
 import { default as axios } from '../api/axios-api.js';
 import api from '../config/config.js';
-import _ from 'lodash';
 
 import {
     SAVE_CART,
@@ -144,6 +143,7 @@ function* emptyCarts(action) {
 
 function emptyCartsApi(payload) {
     let cartId = localStorage.getItem('cartId');
+    localStorage.removeItem('cartId');
     return axios({
         method: "delete",
         url: api.api_path + api.version_path + api.shoppingCart_path + '/empty/' + cartId,

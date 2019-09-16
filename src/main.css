@@ -869,7 +869,7 @@ table > tbody > tr > td:first-child{
     font-size: 34px;
 }
 .product-sidebar h2{
-    font-size: 25;
+    font-size: 25px;
 }
 .form-control{
     width: 40%;
@@ -898,8 +898,10 @@ table > tbody > tr > td:first-child{
     background-color: #f62f5e;
     border-color: #f62f5e;
     border-radius: 50px;
-    padding: 0 15px;
+    /*padding: 0 15px;*/
+    height: 40px;
     outline: none!important;
+    text-transform: uppercase;
 }
 .btn-default:hover,
 .btn-default:active,
@@ -908,6 +910,7 @@ table > tbody > tr > td:first-child{
     color: #f62f5e;
     background-color: #fff;
     border: 1px solid #fff;
+    box-shadow: 0 7px 14px rgba(50, 50, 93, .10), 0 3px 6px rgba(0, 0, 0, .08);
 }
 .btn-number,
 .btn-number:hover,
@@ -934,12 +937,36 @@ table > tbody > tr > td:first-child{
     color: #fff;
     background-color: #f62f5e;
     border-color: #f62f5e;
+    box-shadow: 0 7px 14px rgba(50, 50, 93, .10), 0 3px 6px rgba(0, 0, 0, .08);
+}
+.btn-inverse.product {
+    color: #f62f5e;
+    background-color: #fff;
+    border-color: #fff;
+    border-radius: 50px;
+    padding: 0 15px;
+    outline: none!important;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.btn-inverse.product:hover,
+.btn-inverse.product:active,
+.btn-inverse.product:focus,
+.btn-inverse.product:active:focus{
+    color: #fff;
+    background-color: #f62f5e;
+    border-color: #f62f5e;
+    box-shadow: 0 7px 14px rgba(50, 50, 93, .10), 0 3px 6px rgba(0, 0, 0, .08);
 }
 .table-basket thead{
     border-bottom: 1px solid #eee;
 }
 .table-basket th{
     text-align: center;
+}
+.panel-default{
+    box-shadow: 0 7px 14px rgba(50, 50, 93, .10), 0 3px 6px rgba(0, 0, 0, .08);
+    border: none;
 }
 @media only screen and (max-width: 768px){
     .top{
